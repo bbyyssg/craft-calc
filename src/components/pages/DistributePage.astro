@@ -1,0 +1,217 @@
+---
+import Base from "../../layouts/Base.astro";
+import Faq from "../Faq.astro";
+import AdSlot from "../AdSlot.astro";
+import { ui } from "../../i18n/ui";
+import { faqJsonLd, toolJsonLd } from "../../lib/seo";
+import { pagePath, type Lang } from "../../site";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui(lang);
+const path = pagePath(lang, "distribute");
+const gaugeLink = pagePath(lang, "gauge");
+const circleLink = pagePath(lang, "circle");
+
+const C = {
+  es: {
+    title: "Calculadora de aumentos y disminuciones repartidos (tejido)",
+    h1: "Calculadora de aumentos y disminuciones uniformes",
+    description:
+      "Reparte aumentos o disminuciones de forma uniforme en una vuelta de punto: indica tus puntos y cuántos quieres tener, y obtén la instrucción exacta, en plano o en redondo.",
+    lead: "Escribe cuántos puntos tienes y cuántos quieres tener al terminar la vuelta. La calculadora reparte los aumentos o disminuciones lo más uniforme posible y te da la instrucción lista para tejer.",
+    current: "Puntos que tienes ahora",
+    target: "Puntos que quieres al final",
+    targetHint: "Ej.: de 58 a 68 = 10 aumentos",
+    mode: "Cómo tejes",
+    flat: "En plano (ida y vuelta)",
+    round: "En redondo (circular)",
+    howTitle: "Cómo se reparten los aumentos",
+    how: [
+      "Divide los puntos que tienes entre el número de aumentos: <span class=\"formula\">puntos ÷ aumentos = puntos entre cada aumento</span>. Si sale un número entero, ya está: con 20 puntos y 4 aumentos tejes 5 y aumentas 1, cuatro veces.",
+      "Si sale con decimales (58 ÷ 10 = 5,8), unos tramos llevarán 5 puntos y otros 6. La calculadora alterna los tramos largos y cortos para que los aumentos queden repartidos a lo largo de toda la vuelta, sin amontonarse al final.",
+      "<b>En plano</b> hay un tramo más que aumentos (los dos bordes), así que la calculadora deja medio tramo al principio y medio al final. Así ningún aumento cae en el punto de orillo y la pieza queda simétrica.",
+      "<b>Disminuciones</b>: cada disminución (2 puntos juntos) consume dos puntos. Por eso primero se restan 2 × disminuciones a los puntos y lo que queda se reparte entre los tramos. Ejemplo: 60 puntos en redondo y 10 disminuciones → (60 − 20) ÷ 10 = 4 → <b>(teje 4, 2 juntos) × 10</b> = 50 puntos.",
+    ],
+    exampleTitle: "Ejemplo resuelto",
+    example:
+      "Tienes 58 puntos en plano y quieres 68 (10 aumentos). Tramos de 5 y 6 puntos, con medio tramo en cada borde: <b>3 p, aum, (6 p, aum) × 4, 5 p, aum, (6 p, aum) × 4, 2 p</b>. Total: 58 + 10 = 68 puntos.",
+    faq: [
+      { q: "¿Qué aumento uso: lazada, aumento invisible o M1?", a: "Cualquiera que no consuma puntos de la aguja izquierda: lazada (deja agujerito), aumento levantando la hebra entre puntos (M1, casi invisible) o punto doble (1 punto tejido por delante y por detrás). Si usas este último, ten en cuenta que se teje <i>sobre</i> un punto, así que el punto anterior al aumento cuenta dentro del tramo." },
+      { q: "¿Qué pasa si quiero más aumentos que puntos?", a: "En redondo puedes hacer como máximo un aumento por punto (doblar los puntos). En plano, uno menos que los puntos, para no aumentar en el orillo. Si necesitas más, reparte el cambio en dos vueltas." },
+      { q: "¿Sirve para ganchillo?", a: "Sí. Lee «p» como punto de ganchillo (por ejemplo, punto bajo), «aum» como 2 puntos en el mismo punto y «2 juntos» como una disminución. Para círculos planos usa la <a href=\"" + circleLink + "\">calculadora de círculo</a>." },
+      { q: "¿Cómo sé cuántos puntos necesito?", a: "Mide tu muestra y usa la <a href=\"" + gaugeLink + "\">calculadora de muestra</a>: te dice cuántos puntos corresponden a cada medida." },
+      { q: "¿Por qué mi patrón dice «aumenta 10 puntos repartidos» sin más?", a: "Porque la posición exacta depende de ti. Lo importante es que los aumentos queden separados por tramos parecidos; desplazarlos un punto a un lado u otro no se nota." },
+    ],
+    sources: [
+      { href: "https://www.knitpro.eu/es/blog/como-aumentar-puntos-de-manera-uniforme", label: "KnitPro — Cómo aumentar puntos de manera uniforme" },
+      { href: "https://tricotandocroche.com/2017/04/como-distribuir-aumentos-no-trico", label: "Tricotando Crochê — Como distribuir aumentos no tricô (ejemplo de 58 puntos)" },
+    ],
+    r: {
+      inc: "aum",
+      dec: "2 juntos",
+      st: "p",
+      times: "veces",
+      summaryInc: "{n} aumentos: de {from} a {to} puntos.",
+      summaryDec: "{n} disminuciones: de {from} a {to} puntos.",
+      same: "Ya tienes esos puntos: no hace falta aumentar ni disminuir.",
+      legend: "p = puntos tejidos normalmente · aum = 1 aumento · 2 juntos = 1 disminución",
+      errors: {
+        stitches: "Escribe un número entero de puntos actuales.",
+        target: "Escribe un número entero de puntos finales.",
+        tooManyInc: "Demasiados aumentos para esos puntos. Repártelos en dos vueltas.",
+        tooManyDec: "Demasiadas disminuciones: cada una necesita 2 puntos. Repártelas en dos vueltas.",
+      },
+    },
+  },
+  pt: {
+    title: "Calculadora de aumentos e diminuições distribuídos (tricô)",
+    h1: "Calculadora de aumentos e diminuições distribuídos",
+    description:
+      "Distribua aumentos ou diminuições por igual na carreira de tricô: informe quantos pontos tem e quantos quer ter e receba a instrução pronta, em tricô reto ou circular.",
+    lead: "Digite quantos pontos você tem e quantos quer ter no fim da carreira. A calculadora distribui os aumentos ou diminuições da forma mais uniforme possível e mostra a instrução pronta para tricotar.",
+    current: "Pontos que você tem agora",
+    target: "Pontos que quer ter no final",
+    targetHint: "Ex.: de 58 para 68 = 10 aumentos",
+    mode: "Como você tricota",
+    flat: "Reto (ida e volta)",
+    round: "Circular",
+    howTitle: "Como distribuir os aumentos",
+    how: [
+      "Divida os pontos que você tem pelo número de aumentos: <span class=\"formula\">pontos ÷ aumentos = pontos entre cada aumento</span>. Se der número inteiro, pronto: com 20 pontos e 4 aumentos, tricote 5 e aumente 1, quatro vezes.",
+      "Se der número quebrado (58 ÷ 10 = 5,8), alguns trechos terão 5 pontos e outros 6. A calculadora alterna trechos longos e curtos para os aumentos ficarem espalhados pela carreira toda, sem amontoar no fim.",
+      "<b>No tricô reto</b> há um trecho a mais do que aumentos (as duas bordas), então a calculadora deixa meio trecho no começo e meio no fim. Assim nenhum aumento cai no ponto de ourela e a peça fica simétrica.",
+      "<b>Diminuições</b>: cada diminuição (2 pontos juntos) consome dois pontos. Por isso primeiro se subtrai 2 × diminuições dos pontos e o resto é distribuído entre os trechos. Exemplo: 60 pontos em circular e 10 diminuições → (60 − 20) ÷ 10 = 4 → <b>(tricote 4, 2 juntos) × 10</b> = 50 pontos.",
+    ],
+    exampleTitle: "Exemplo resolvido",
+    example:
+      "Você tem 58 pontos em tricô reto e quer 68 (10 aumentos). Trechos de 5 e 6 pontos, com meio trecho em cada borda: <b>3 p, aum, (6 p, aum) × 4, 5 p, aum, (6 p, aum) × 4, 2 p</b>. Total: 58 + 10 = 68 pontos.",
+    faq: [
+      { q: "Qual aumento usar: laçada, aumento invisível ou M1?", a: "Qualquer um que não consuma pontos da agulha esquerda: laçada (deixa furinho), aumento levantando o fio entre pontos (M1, quase invisível) ou ponto duplo (tricotar pela frente e por trás do mesmo ponto). Neste último caso o aumento é feito <i>sobre</i> um ponto, então o ponto anterior ao aumento conta dentro do trecho." },
+      { q: "E se eu quiser mais aumentos do que pontos?", a: "Em circular, no máximo um aumento por ponto (dobrar os pontos). No reto, um a menos do que os pontos, para não aumentar na ourela. Se precisar de mais, divida em duas carreiras." },
+      { q: "Serve para crochê?", a: "Sim. Leia «p» como ponto de crochê (por exemplo, ponto baixo), «aum» como 2 pontos no mesmo ponto e «2 juntos» como uma diminuição. Para círculos planos use a <a href=\"" + circleLink + "\">calculadora de círculo</a>." },
+      { q: "Como sei quantos pontos preciso?", a: "Meça sua amostra e use a <a href=\"" + gaugeLink + "\">calculadora de amostra</a>: ela diz quantos pontos correspondem a cada medida." },
+      { q: "Por que a receita só diz «aumente 10 pontos distribuídos»?", a: "Porque a posição exata fica a seu critério. O importante é os aumentos ficarem separados por trechos parecidos; mudar um ponto para lá ou para cá não aparece." },
+    ],
+    sources: [
+      { href: "https://tricotandocroche.com/2017/04/como-distribuir-aumentos-no-trico", label: "Tricotando Crochê — Como distribuir aumentos no tricô" },
+      { href: "https://www.knitpro.eu/es/blog/como-aumentar-puntos-de-manera-uniforme", label: "KnitPro — Como aumentar pontos de maneira uniforme (em espanhol)" },
+    ],
+    r: {
+      inc: "aum",
+      dec: "2 juntos",
+      st: "p",
+      times: "vezes",
+      summaryInc: "{n} aumentos: de {from} para {to} pontos.",
+      summaryDec: "{n} diminuições: de {from} para {to} pontos.",
+      same: "Você já tem esses pontos: não é preciso aumentar nem diminuir.",
+      legend: "p = pontos tricotados normalmente · aum = 1 aumento · 2 juntos = 1 diminuição",
+      errors: {
+        stitches: "Digite um número inteiro de pontos atuais.",
+        target: "Digite um número inteiro de pontos finais.",
+        tooManyInc: "Aumentos demais para esses pontos. Divida em duas carreiras.",
+        tooManyDec: "Diminuições demais: cada uma precisa de 2 pontos. Divida em duas carreiras.",
+      },
+    },
+  },
+}[lang];
+---
+
+<Base
+  lang={lang}
+  title={C.title}
+  description={C.description}
+  page="distribute"
+  jsonLd={[toolJsonLd(lang, path, C.h1, C.description), faqJsonLd(C.faq)]}
+>
+  <h1>{C.h1}</h1>
+  <p class="lead">{C.lead}</p>
+
+  <form class="card" id="dist-form" novalidate>
+    <div class="form-grid">
+      <div>
+        <label for="d-current">{C.current}</label>
+        <input id="d-current" name="current" type="number" inputmode="numeric" min="1" step="1" placeholder="58" />
+      </div>
+      <div>
+        <label for="d-target">{C.target}</label>
+        <input id="d-target" name="target" type="number" inputmode="numeric" min="1" step="1" placeholder="68" />
+        <span class="hint">{C.targetHint}</span>
+      </div>
+      <fieldset>
+        <legend>{C.mode}</legend>
+        <div class="radio-row">
+          <label><input type="radio" name="mode" value="flat" checked /> {C.flat}</label>
+          <label><input type="radio" name="mode" value="round" /> {C.round}</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="actions"><button class="btn" type="submit">{t.calc}</button></div>
+    <div class="result" id="dist-result" aria-live="polite"></div>
+  </form>
+  <script type="application/json" id="dist-i18n" set:html={JSON.stringify(C.r)} />
+
+  <AdSlot />
+
+  <h2>{C.howTitle}</h2>
+  {C.how.map((p) => <p set:html={p} />)}
+
+  <h3>{C.exampleTitle}</h3>
+  <p class="example" set:html={C.example} />
+
+  <Faq title={t.faq} items={C.faq} />
+
+  <h2>{t.sources}</h2>
+  <ul>{C.sources.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}</a></li>)}</ul>
+</Base>
+
+<script>
+  import { distribute, validateDistribute, changesBetween, type Run } from "../../lib/distribute";
+
+  const form = document.getElementById("dist-form") as HTMLFormElement;
+  const out = document.getElementById("dist-result") as HTMLElement;
+  const s = JSON.parse(document.getElementById("dist-i18n")!.textContent!);
+
+  const fill = (tpl: string, v: Record<string, number>) => tpl.replace(/\{(\w+)\}/g, (_, k) => String(v[k]));
+
+  function step(run: Run, act: string): string {
+    const one = run.knit > 0 ? `${run.knit} ${s.st}, ${act}` : act;
+    return run.times > 1 ? `(${one}) × ${run.times}` : one;
+  }
+
+  function render() {
+    const data = new FormData(form);
+    const rawA = String(data.get("current") ?? "");
+    const rawB = String(data.get("target") ?? "");
+    if (!rawA || !rawB) {
+      out.innerHTML = "";
+      return;
+    }
+    const current = Number(rawA);
+    const target = Number(rawB);
+    if (!Number.isInteger(current) || current < 1) return void (out.innerHTML = `<div class="status bad">${s.errors.stitches}</div>`);
+    if (!Number.isInteger(target) || target < 1) return void (out.innerHTML = `<div class="status bad">${s.errors.target}</div>`);
+    if (current === target) return void (out.innerHTML = `<div class="status ok">${s.same}</div>`);
+
+    const { shaping, changes } = changesBetween(current, target);
+    const mode = data.get("mode") === "round" ? "round" : "flat";
+    const input = { stitches: current, changes, shaping, mode } as const;
+    const error = validateDistribute(input);
+    if (error) return void (out.innerHTML = `<div class="status bad">${s.errors[error] ?? error}</div>`);
+
+    const r = distribute(input);
+    const act = shaping === "inc" ? s.inc : s.dec;
+    const parts = r.runs.map((run) => step(run, act));
+    if (r.tail > 0) parts.push(`${r.tail} ${s.st}`);
+    const summary = fill(shaping === "inc" ? s.summaryInc : s.summaryDec, { n: changes, from: current, to: r.finalStitches });
+    out.innerHTML = `<p>${summary}</p><div class="instruction">${parts.join(", ")}</div><p class="hint">${s.legend}</p>`;
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    render();
+  });
+  form.addEventListener("input", render);
+</script>

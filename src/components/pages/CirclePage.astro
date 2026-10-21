@@ -1,0 +1,219 @@
+---
+import Base from "../../layouts/Base.astro";
+import Faq from "../Faq.astro";
+import AdSlot from "../AdSlot.astro";
+import { ui } from "../../i18n/ui";
+import { faqJsonLd, toolJsonLd } from "../../lib/seo";
+import { pagePath, type Lang } from "../../site";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui(lang);
+const path = pagePath(lang, "circle");
+const distLink = pagePath(lang, "distribute");
+
+const C = {
+  es: {
+    title: "Calculadora de círculo de ganchillo: aumentos por vuelta",
+    h1: "Calculadora de círculo de ganchillo",
+    description:
+      "Cuántos puntos y qué aumentos hacer en cada vuelta de un círculo plano de ganchillo (punto bajo, medio punto alto o punto alto), con aumentos alternados para que quede redondo.",
+    lead: "Elige el punto y cuántas vueltas quieres. Te damos los puntos de cada vuelta y la instrucción, con los aumentos desplazados en vueltas alternas para que el círculo no quede hexagonal.",
+    stitch: "Punto",
+    stitches: [
+      { value: "pb", start: 6, label: "Punto bajo (pb)" },
+      { value: "mpa", start: 8, label: "Medio punto alto (mpa)" },
+      { value: "pa", start: 12, label: "Punto alto (pa)" },
+    ],
+    start: "Puntos en la vuelta 1",
+    rounds: "Número de vueltas",
+    height: "Alto de una vuelta (cm, opcional)",
+    heightHint: "Mídelo en tu muestra; sirve para estimar el diámetro",
+    stagger: "Alternar la posición de los aumentos",
+    howTitle: "La regla del círculo plano",
+    how: [
+      "En la vuelta 1 se tejen <i>n</i> puntos en el anillo mágico. En cada vuelta siguiente se hacen <b>n aumentos</b> (2 puntos en el mismo punto), así que la vuelta <i>v</i> tiene <span class=\"formula\">n × v</span> puntos.",
+      "Entre aumento y aumento se teje un punto normal más en cada vuelta: en la vuelta <i>v</i> hay <span class=\"formula\">v − 2</span> puntos normales entre aumentos. Vuelta 2: aumento en cada punto; vuelta 3: (1 pb, aum); vuelta 4: (2 pb, aum)…",
+      "Si los aumentos caen siempre encima de los de la vuelta anterior, el círculo se convierte en un hexágono. Para evitarlo, en las vueltas pares la calculadora empieza con la mitad de los puntos normales y termina con la otra mitad.",
+      "El número inicial depende de la altura del punto: unos 6 para punto bajo, 8 para medio punto alto y 12 para punto alto. Si tu círculo se ondula, sobran aumentos; si se abomba como un cuenco, faltan.",
+    ],
+    exampleTitle: "Ejemplo resuelto",
+    example:
+      "Punto bajo, 6 vueltas: 6, 12, 18, 24, 30 y 36 puntos. La vuelta 4 alternada queda <b>1 pb, aum, (2 pb, aum) × 5, 1 pb</b> = 1 + 2 + 5 × 4 + 1 = 24 puntos.",
+    faq: [
+      { q: "¿Por qué mi círculo de ganchillo se ondula?", a: "Tiene demasiados puntos para su tamaño: o empezaste con más puntos de los que pide la altura del punto, o tu tensión es floja. Prueba a empezar con un punto menos o usa un ganchillo más pequeño." },
+      { q: "¿Y si se curva hacia arriba?", a: "Faltan aumentos o tejes muy apretado. Empieza con uno o dos puntos más en la vuelta 1 o usa un ganchillo mayor." },
+      { q: "¿Se cuenta el punto de cadeneta inicial?", a: "No. Los totales de esta calculadora son solo puntos de la vuelta; la cadeneta de subida y el punto deslizado de cierre no se cuentan." },
+      { q: "¿Sirve para amigurumi?", a: "Sí, para la base y las primeras vueltas de cualquier esfera: se aumenta así hasta el diámetro deseado, se tejen vueltas sin aumentos y luego se disminuye con la misma lógica." },
+      { q: "¿Cómo reparto aumentos en una vuelta que no es de un círculo?", a: "Usa la <a href=\"" + distLink + "\">calculadora de aumentos y disminuciones</a>." },
+    ],
+    sources: [
+      { href: "https://patronarte.com/tutoriales/como-hacer-circulos-de-crochet-planos/", label: "Patronarte — Cómo hacer círculos de crochet planos" },
+      { href: "https://melonchillo.com/anillo-magico/", label: "Melonchillo — Anillo mágico y círculo perfecto (punto alto, 12 puntos)" },
+    ],
+    r: {
+      ring: "{n} {st} en el anillo mágico",
+      every: "aum en cada punto (× {n})",
+      repeat: "({b} {st}, aum) × {n}",
+      staggered: "{l} {st}, aum, ({b} {st}, aum) × {m}, {t} {st}",
+      round: "Vuelta",
+      total: "Puntos",
+      instr: "Instrucciones",
+      diameter: "Diámetro aproximado: {d} cm",
+      error: "Escribe un número de puntos entre 3 y 24 y de vueltas entre 1 y 100.",
+    },
+  },
+  pt: {
+    title: "Calculadora de círculo de crochê: aumentos por carreira",
+    h1: "Calculadora de círculo de crochê",
+    description:
+      "Quantos pontos e quais aumentos fazer em cada carreira de um círculo plano de crochê (ponto baixo, meio ponto alto ou ponto alto), com aumentos alternados para ficar redondo.",
+    lead: "Escolha o ponto e quantas carreiras quer. Mostramos os pontos de cada carreira e a instrução, com os aumentos deslocados em carreiras alternadas para o círculo não ficar sextavado.",
+    stitch: "Ponto",
+    stitches: [
+      { value: "pb", start: 6, label: "Ponto baixo (pb)" },
+      { value: "mpa", start: 8, label: "Meio ponto alto (mpa)" },
+      { value: "pa", start: 12, label: "Ponto alto (pa)" },
+    ],
+    start: "Pontos na carreira 1",
+    rounds: "Número de carreiras",
+    height: "Altura de uma carreira (cm, opcional)",
+    heightHint: "Meça na sua amostra; serve para estimar o diâmetro",
+    stagger: "Alternar a posição dos aumentos",
+    howTitle: "A regra do círculo plano",
+    how: [
+      "Na carreira 1 fazem-se <i>n</i> pontos no anel mágico. Em cada carreira seguinte fazem-se <b>n aumentos</b> (2 pontos no mesmo ponto), então a carreira <i>c</i> tem <span class=\"formula\">n × c</span> pontos.",
+      "Entre um aumento e outro entra um ponto normal a mais a cada carreira: na carreira <i>c</i> há <span class=\"formula\">c − 2</span> pontos normais entre aumentos. Carreira 2: aumento em todos os pontos; carreira 3: (1 pb, aum); carreira 4: (2 pb, aum)…",
+      "Se os aumentos caem sempre em cima dos da carreira anterior, o círculo vira um hexágono. Para evitar isso, nas carreiras pares a calculadora começa com metade dos pontos normais e termina com a outra metade.",
+      "O número inicial depende da altura do ponto: cerca de 6 para ponto baixo, 8 para meio ponto alto e 12 para ponto alto. Se o círculo ondular, há aumentos demais; se virar uma tigela, faltam aumentos.",
+    ],
+    exampleTitle: "Exemplo resolvido",
+    example:
+      "Ponto baixo, 6 carreiras: 6, 12, 18, 24, 30 e 36 pontos. A carreira 4 alternada fica <b>1 pb, aum, (2 pb, aum) × 5, 1 pb</b> = 1 + 2 + 5 × 4 + 1 = 24 pontos.",
+    faq: [
+      { q: "Por que meu círculo de crochê está ondulando?", a: "Ele tem pontos demais para o tamanho: ou você começou com mais pontos do que a altura do ponto pede, ou sua tensão está frouxa. Tente começar com um ponto a menos ou use uma agulha menor." },
+      { q: "E se ele curvar para cima?", a: "Faltam aumentos ou você crocheta muito apertado. Comece com um ou dois pontos a mais na carreira 1 ou use uma agulha maior." },
+      { q: "A correntinha inicial conta como ponto?", a: "Não. Os totais desta calculadora são só os pontos da carreira; a correntinha de subida e o ponto baixíssimo de fechamento não contam." },
+      { q: "Serve para amigurumi?", a: "Sim, para a base e as primeiras carreiras de qualquer esfera: aumente assim até o diâmetro desejado, faça carreiras sem aumento e depois diminua com a mesma lógica." },
+      { q: "Como distribuo aumentos numa carreira que não é de círculo?", a: "Use a <a href=\"" + distLink + "\">calculadora de aumentos e diminuições</a>." },
+    ],
+    sources: [
+      { href: "https://www.nataliasalgado.com.br/post/oredondinhoperfeito", label: "Natalia Salgado — O redondinho perfeito" },
+      { href: "https://patronarte.com/tutoriales/como-hacer-circulos-de-crochet-planos/", label: "Patronarte — Círculos de crochê planos (em espanhol)" },
+    ],
+    r: {
+      ring: "{n} {st} no anel mágico",
+      every: "aum em todos os pontos (× {n})",
+      repeat: "({b} {st}, aum) × {n}",
+      staggered: "{l} {st}, aum, ({b} {st}, aum) × {m}, {t} {st}",
+      round: "Carreira",
+      total: "Pontos",
+      instr: "Instruções",
+      diameter: "Diâmetro aproximado: {d} cm",
+      error: "Digite um número de pontos entre 3 e 24 e de carreiras entre 1 e 100.",
+    },
+  },
+}[lang];
+---
+
+<Base
+  lang={lang}
+  title={C.title}
+  description={C.description}
+  page="circle"
+  jsonLd={[toolJsonLd(lang, path, C.h1, C.description), faqJsonLd(C.faq)]}
+>
+  <h1>{C.h1}</h1>
+  <p class="lead">{C.lead}</p>
+
+  <form class="card" id="circle-form" novalidate>
+    <div class="form-grid">
+      <div>
+        <label for="c-stitch">{C.stitch}</label>
+        <select id="c-stitch" name="stitch">
+          {C.stitches.map((o) => <option value={o.value} data-start={o.start}>{o.label}</option>)}
+        </select>
+      </div>
+      <div>
+        <label for="c-start">{C.start}</label>
+        <input id="c-start" name="start" type="number" inputmode="numeric" min="3" max="24" step="1" value="6" />
+      </div>
+      <div>
+        <label for="c-rounds">{C.rounds}</label>
+        <input id="c-rounds" name="rounds" type="number" inputmode="numeric" min="1" max="100" step="1" value="8" />
+      </div>
+      <div>
+        <label for="c-height">{C.height}</label>
+        <input id="c-height" name="height" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0.5" />
+        <span class="hint">{C.heightHint}</span>
+      </div>
+    </div>
+    <p><label class="checkbox"><input type="checkbox" name="stagger" checked /> {C.stagger}</label></p>
+    <div class="actions"><button class="btn" type="submit">{t.calc}</button></div>
+    <div class="result" id="circle-result" aria-live="polite"></div>
+  </form>
+  <script type="application/json" id="circle-i18n" set:html={JSON.stringify(C.r)} />
+
+  <AdSlot />
+
+  <h2>{C.howTitle}</h2>
+  {C.how.map((p) => <p set:html={p} />)}
+
+  <h3>{C.exampleTitle}</h3>
+  <p class="example" set:html={C.example} />
+
+  <Faq title={t.faq} items={C.faq} />
+
+  <h2>{t.sources}</h2>
+  <ul>{C.sources.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}</a></li>)}</ul>
+</Base>
+
+<script>
+  import { circleRounds, circleDiameter, type CircleRound } from "../../lib/circle";
+
+  const form = document.getElementById("circle-form") as HTMLFormElement;
+  const out = document.getElementById("circle-result") as HTMLElement;
+  const select = document.getElementById("c-stitch") as HTMLSelectElement;
+  const startInput = document.getElementById("c-start") as HTMLInputElement;
+  const s = JSON.parse(document.getElementById("circle-i18n")!.textContent!);
+
+  const fill = (tpl: string, v: Record<string, string | number>) => tpl.replace(/\{(\w+)\}/g, (_, k) => String(v[k]));
+
+  function instruction(r: CircleRound, start: number, st: string): string {
+    if (r.between === null) return fill(s.ring, { n: start, st });
+    if (r.between === 0) return fill(s.every, { n: start });
+    if (r.lead === 0) return fill(s.repeat, { b: r.between, st, n: start });
+    return fill(s.staggered, { l: r.lead, b: r.between, m: start - 1, t: r.trail, st });
+  }
+
+  function render() {
+    const data = new FormData(form);
+    const start = Number(data.get("start"));
+    const rounds = Number(data.get("rounds"));
+    if (!Number.isInteger(start) || start < 3 || start > 24 || !Number.isInteger(rounds) || rounds < 1 || rounds > 100) {
+      out.innerHTML = `<div class="status bad">${s.error}</div>`;
+      return;
+    }
+    const st = String(data.get("stitch") ?? "pb");
+    const list = circleRounds({ start, rounds, stagger: data.get("stagger") === "on" });
+    const rows = list
+      .map((r) => `<tr><td class="num">${r.round}</td><td class="num">${r.stitches}</td><td>${instruction(r, start, st)}</td></tr>`)
+      .join("");
+    const height = Number(data.get("height"));
+    const diameter = height > 0 ? `<p class="status ok">${fill(s.diameter, { d: circleDiameter(rounds, height).toLocaleString(document.documentElement.lang) })}</p>` : "";
+    out.innerHTML = `${diameter}<table><thead><tr><th>${s.round}</th><th>${s.total}</th><th>${s.instr}</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  select.addEventListener("change", () => {
+    startInput.value = select.selectedOptions[0].dataset.start ?? "6";
+    render();
+  });
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    render();
+  });
+  form.addEventListener("input", render);
+  render();
+</script>

@@ -1,0 +1,26 @@
+---
+// Renders a responsive AdSense unit only when a publisher ID and slot are configured.
+import { SITE } from "../site";
+
+interface Props {
+  slot?: string;
+}
+const { slot = "" } = Astro.props;
+const enabled = Boolean(SITE.adsenseClient && slot);
+---
+
+{
+  enabled && (
+    <div class="ad-slot">
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client={SITE.adsenseClient}
+        data-ad-slot={slot}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+      <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  )
+}

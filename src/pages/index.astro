@@ -1,0 +1,39 @@
+---
+// Language chooser at the root. Browsers are sent to /pt/ or /es/ by language;
+// without JavaScript (and for crawlers) the two links remain.
+import "../styles/global.css";
+import { SITE, LANGS, HTML_LANG, BASE, pagePath, asset } from "../site";
+const abs = (p: string) => new URL(p, SITE.url).href;
+const targets = { es: pagePath("es", "home"), pt: pagePath("pt", "home") };
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{SITE.name} — Calculadoras para tejer · Calculadoras para tricô</title>
+    <meta name="description" content="Calculadoras gratis para tejer, ganchillo y velas. Calculadoras grátis para tricô, crochê e velas." />
+    <link rel="canonical" href={abs(BASE + "/")} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={abs(pagePath(l, "home"))} />)}
+    <link rel="alternate" hreflang="x-default" href={abs(BASE + "/")} />
+    <link rel="icon" href={asset("/favicon.svg")} type="image/svg+xml" />
+    <script is:inline define:vars={{ targets }}>
+      var l = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+      location.replace(/^pt/i.test(l) ? targets.pt : targets.es);
+    </script>
+  </head>
+  <body>
+    <main class="container" style="max-width:560px;padding-top:60px">
+      <h1>{SITE.name}</h1>
+      <div class="tool-list">
+        <a href={pagePath("es", "home")} hreflang="es">
+          <div class="card"><h2 style="margin:0;font-size:18px">Español</h2><p style="margin:0;color:var(--muted)">Calculadoras para tejer, ganchillo y velas</p></div>
+        </a>
+        <a href={pagePath("pt", "home")} hreflang="pt-BR" lang="pt-BR">
+          <div class="card"><h2 style="margin:0;font-size:18px">Português (Brasil)</h2><p style="margin:0;color:var(--muted)">Calculadoras para tricô, crochê e velas</p></div>
+        </a>
+      </div>
+    </main>
+  </body>
+</html>

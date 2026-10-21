@@ -1,0 +1,61 @@
+---
+import Base from "../../layouts/Base.astro";
+import { ui } from "../../i18n/ui";
+import { TOOLS, pagePath, type Lang } from "../../site";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui(lang);
+
+const C = {
+  es: {
+    title: "Calculadoras para tejer, ganchillo y velas",
+    h1: "Calculadoras gratis para tejer, ganchillo y velas",
+    description:
+      "Calculadoras gratis en español: repartir aumentos y disminuciones, círculo de ganchillo, muestra de tejido y cera y fragancia para velas. Con fórmulas y ejemplos.",
+    lead: "Herramientas sencillas para las cuentas que más se repiten al tejer y al hacer velas. Cada una explica la fórmula y trae un ejemplo resuelto.",
+    why: "Por qué usarlas",
+    points: [
+      "<b>Instrucciones listas para tejer</b>, no solo números: «(6 p, aum) × 4».",
+      "<b>Privadas</b>: todo se calcula en tu navegador; no se envía nada a ningún servidor.",
+      "<b>Con fuentes</b>: cada página explica la fórmula y enlaza a las guías en que se basa.",
+    ],
+  },
+  pt: {
+    title: "Calculadoras para tricô, crochê e velas",
+    h1: "Calculadoras grátis para tricô, crochê e velas",
+    description:
+      "Calculadoras grátis em português: distribuir aumentos e diminuições, círculo de crochê, amostra de tricô e cera e essência para velas. Com fórmulas e exemplos.",
+    lead: "Ferramentas simples para as contas que mais se repetem no tricô, no crochê e na produção de velas. Cada uma explica a fórmula e traz um exemplo resolvido.",
+    why: "Por que usar",
+    points: [
+      "<b>Instruções prontas para tricotar</b>, não só números: «(6 p, aum) × 4».",
+      "<b>Privadas</b>: tudo é calculado no seu navegador; nada é enviado a nenhum servidor.",
+      "<b>Com fontes</b>: cada página explica a fórmula e indica os guias em que se baseia.",
+    ],
+  },
+}[lang];
+---
+
+<Base lang={lang} title={C.title} description={C.description} page="home">
+  <h1>{C.h1}</h1>
+  <p class="lead">{C.lead}</p>
+
+  <div class="tool-list">
+    {
+      TOOLS.map((key) => (
+        <a href={pagePath(lang, key)}>
+          <div class="card">
+            <h2 style="margin:0 0 6px;font-size:18px">{t.toolNames[key]}</h2>
+            <p style="margin:0;color:var(--muted)">{t.toolBlurbs[key]}</p>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+
+  <h2>{C.why}</h2>
+  <ul>{C.points.map((p) => <li set:html={p} />)}</ul>
+</Base>

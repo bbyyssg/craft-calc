@@ -1,0 +1,38 @@
+---
+import Base from "../../layouts/Base.astro";
+import { SITE, type Lang } from "../../site";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const C = {
+  es: {
+    title: "Acerca de",
+    description: `Qué es ${SITE.name}, cómo se calculan los resultados y cómo contactar.`,
+    paras: [
+      `${SITE.name} reúne calculadoras gratuitas para tejer, hacer ganchillo y fabricar velas. Las fórmulas son las que se usan habitualmente en guías y patrones; cada página las explica y enlaza a sus fuentes.`,
+      "Los resultados son orientativos. Tu tensión, la lana, la cera y la fragancia concretas pueden pedir ajustes: teje siempre una muestra y sigue las indicaciones del fabricante de la cera.",
+      "Si encuentras un error o echas en falta una calculadora, escríbenos.",
+    ],
+    contact: "Contacto",
+  },
+  pt: {
+    title: "Sobre",
+    description: `O que é o ${SITE.name}, como os resultados são calculados e como entrar em contato.`,
+    paras: [
+      `O ${SITE.name} reúne calculadoras gratuitas para tricô, crochê e produção de velas. As fórmulas são as usadas normalmente em guias e receitas; cada página as explica e indica as fontes.`,
+      "Os resultados são aproximados. Sua tensão, o fio, a cera e a essência específicos podem pedir ajustes: faça sempre uma amostra e siga as indicações do fabricante da cera.",
+      "Se encontrar um erro ou sentir falta de alguma calculadora, escreva para nós.",
+    ],
+    contact: "Contato",
+  },
+}[lang];
+---
+
+<Base lang={lang} title={C.title} description={C.description} page="about">
+  <h1>{C.title}</h1>
+  {C.paras.map((p) => <p>{p}</p>)}
+  {SITE.contactEmail && <p>{C.contact}: <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a></p>}
+</Base>

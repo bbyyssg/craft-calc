@@ -1,0 +1,236 @@
+---
+import Base from "../../layouts/Base.astro";
+import Faq from "../Faq.astro";
+import AdSlot from "../AdSlot.astro";
+import { ui } from "../../i18n/ui";
+import { faqJsonLd, toolJsonLd } from "../../lib/seo";
+import { pagePath, type Lang } from "../../site";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui(lang);
+const path = pagePath(lang, "gauge");
+const distLink = pagePath(lang, "distribute");
+
+const C = {
+  es: {
+    title: "Calculadora de muestra de tejido: puntos y vueltas por cm",
+    h1: "Calculadora de muestra (tensión) para punto y ganchillo",
+    description:
+      "Con tu muestra calcula cuántos puntos montar y cuántas vueltas tejer para una medida, o adapta los puntos de un patrón a tu tensión. Respeta múltiplos del punto.",
+    lead: "Dos calculadoras en una: pasa de centímetros a puntos y vueltas con tu muestra, o convierte los puntos de un patrón cuando tu muestra no coincide con la del patrón.",
+    aTitle: "1. De medida a puntos y vueltas",
+    swatchSts: "Puntos en la muestra",
+    swatchRows: "Vueltas en la muestra",
+    swatchW: "Ancho medido (cm)",
+    swatchH: "Alto medido (cm)",
+    width: "Ancho que quieres (cm)",
+    height: "Alto que quieres (cm, opcional)",
+    multiple: "Múltiplo del punto",
+    extra: "Puntos extra",
+    multipleHint: "Ej.: elástico 2×2 con orillos = múltiplo 4 + 2",
+    bTitle: "2. Adaptar un patrón a tu muestra",
+    patternGauge: "Puntos en 10 cm según el patrón",
+    yourGauge: "Tus puntos en 10 cm",
+    patternCount: "Puntos que indica el patrón",
+    patternHint: "Sirve igual para vueltas: usa vueltas en 10 cm",
+    howTitle: "Fórmulas",
+    how: [
+      "<b>Puntos para una medida</b> (regla de tres): <span class=\"formula\">puntos = puntos de la muestra × ancho deseado ÷ ancho de la muestra</span>. Con 18 puntos en 10 cm y 55 cm de ancho: 18 × 55 ÷ 10 = 99 puntos. Las vueltas se calculan igual con el alto.",
+      "<b>Muestras que no miden 10 cm</b>: si 10 puntos miden 7,5 cm y quieres 23 cm, 10 × 23 ÷ 7,5 = 30,7 → 31 puntos.",
+      "<b>Adaptar un patrón</b>: <span class=\"formula\">tus puntos = puntos del patrón × tu muestra ÷ muestra del patrón</span>. Un patrón con 17 p en 10 cm pide 44 puntos; tu muestra es de 23 p en 10 cm: 44 × 23 ÷ 17 = 59,5 → 60 puntos.",
+      "<b>Múltiplos</b>: si el punto se repite cada <i>m</i> puntos más <i>e</i> extra, el resultado se redondea al número más cercano de la forma <span class=\"formula\">m × n + e</span>. Así el dibujo cuadra en la pieza.",
+    ],
+    exampleTitle: "Ejemplo resuelto",
+    example:
+      "Muestra de 22 puntos y 30 vueltas en 10 × 10 cm. Para una bufanda de 25 × 150 cm en elástico 2×2 con 2 puntos de orillo (múltiplo 4 + 2): 22 × 25 ÷ 10 = 55 → 54 puntos (4 × 13 + 2) y 30 × 150 ÷ 10 = 450 vueltas.",
+    faq: [
+      { q: "¿Cómo se mide bien la muestra?", a: "Teje un cuadrado de al menos 15 × 15 cm con la misma lana, aguja y punto de la prenda, lávalo y déjalo secar como harás con la prenda, y cuenta los puntos en los 10 cm centrales, lejos de los bordes." },
+      { q: "¿Qué hago si mi muestra no coincide con la del patrón?", a: "Primero prueba a cambiar de aguja: más gruesa si tienes más puntos que el patrón, más fina si tienes menos. Si aun así no coincide, adapta los números con la segunda calculadora de esta página." },
+      { q: "¿Redondeo hacia arriba o hacia abajo?", a: "Al más cercano, salvo que el punto tenga múltiplo: entonces al múltiplo más cercano. En prendas ajustadas es preferible redondear hacia arriba." },
+      { q: "¿Sirve para ganchillo?", a: "Sí. Las fórmulas son las mismas para puntos y vueltas de ganchillo." },
+      { q: "He cambiado el número de puntos: ¿cómo reparto la diferencia?", a: "Con la <a href=\"" + distLink + "\">calculadora de aumentos y disminuciones</a>." },
+    ],
+    sources: [
+      { href: "https://www.filati.es/acerca-de-filati/adaptar-modelos.html", label: "Lana Grossa (filati.es) — Convertir patrones de tejido" },
+      { href: "https://www.creativaatelier.com/calcular-los-puntos-tejer-una-chaqueta/", label: "Creativa Atelier — Cómo calcular los puntos para tejer una chaqueta" },
+    ],
+    r: {
+      sts: "Puntos a montar",
+      rows: "Vueltas",
+      exact: "Exacto",
+      real: "Medida real",
+      yours: "Tus puntos",
+      cm: "cm",
+      error: "Revisa los datos: todos deben ser números mayores que 0.",
+    },
+  },
+  pt: {
+    title: "Calculadora de amostra de tricô: pontos e carreiras por cm",
+    h1: "Calculadora de amostra (tensão) para tricô e crochê",
+    description:
+      "Com a sua amostra, calcule quantos pontos montar e quantas carreiras fazer para uma medida, ou adapte os pontos de uma receita à sua tensão. Respeita múltiplos do ponto.",
+    lead: "Duas calculadoras em uma: passe de centímetros para pontos e carreiras com a sua amostra, ou converta os pontos de uma receita quando sua amostra não bate com a da receita.",
+    aTitle: "1. De medida para pontos e carreiras",
+    swatchSts: "Pontos na amostra",
+    swatchRows: "Carreiras na amostra",
+    swatchW: "Largura medida (cm)",
+    swatchH: "Altura medida (cm)",
+    width: "Largura desejada (cm)",
+    height: "Altura desejada (cm, opcional)",
+    multiple: "Múltiplo do ponto",
+    extra: "Pontos extras",
+    multipleHint: "Ex.: canelado 2×2 com ourelas = múltiplo 4 + 2",
+    bTitle: "2. Adaptar uma receita à sua amostra",
+    patternGauge: "Pontos em 10 cm na receita",
+    yourGauge: "Seus pontos em 10 cm",
+    patternCount: "Pontos que a receita pede",
+    patternHint: "Vale também para carreiras: use carreiras em 10 cm",
+    howTitle: "Fórmulas",
+    how: [
+      "<b>Pontos para uma medida</b> (regra de três): <span class=\"formula\">pontos = pontos da amostra × largura desejada ÷ largura da amostra</span>. Com 18 pontos em 10 cm e 55 cm de largura: 18 × 55 ÷ 10 = 99 pontos. As carreiras se calculam do mesmo jeito com a altura.",
+      "<b>Amostras que não medem 10 cm</b>: se 10 pontos medem 7,5 cm e você quer 23 cm, 10 × 23 ÷ 7,5 = 30,7 → 31 pontos.",
+      "<b>Adaptar uma receita</b>: <span class=\"formula\">seus pontos = pontos da receita × sua amostra ÷ amostra da receita</span>. Uma receita com 17 p em 10 cm pede 44 pontos; sua amostra tem 23 p em 10 cm: 44 × 23 ÷ 17 = 59,5 → 60 pontos.",
+      "<b>Múltiplos</b>: se o ponto se repete a cada <i>m</i> pontos mais <i>e</i> extras, o resultado é arredondado para o número mais próximo da forma <span class=\"formula\">m × n + e</span>. Assim o desenho fecha certinho na peça.",
+    ],
+    exampleTitle: "Exemplo resolvido",
+    example:
+      "Amostra com 22 pontos e 30 carreiras em 10 × 10 cm. Para um cachecol de 25 × 150 cm em canelado 2×2 com 2 pontos de ourela (múltiplo 4 + 2): 22 × 25 ÷ 10 = 55 → 54 pontos (4 × 13 + 2) e 30 × 150 ÷ 10 = 450 carreiras.",
+    faq: [
+      { q: "Como medir a amostra corretamente?", a: "Faça um quadrado de pelo menos 15 × 15 cm com o mesmo fio, agulha e ponto da peça, lave e deixe secar como fará com a peça, e conte os pontos nos 10 cm centrais, longe das bordas." },
+      { q: "E se minha amostra não bater com a da receita?", a: "Primeiro tente trocar de agulha: mais grossa se você tem mais pontos que a receita, mais fina se tem menos. Se mesmo assim não bater, adapte os números com a segunda calculadora desta página." },
+      { q: "Arredondo para cima ou para baixo?", a: "Para o mais próximo, a não ser que o ponto tenha múltiplo: aí para o múltiplo mais próximo. Em peças justas, prefira arredondar para cima." },
+      { q: "Serve para crochê?", a: "Sim. As fórmulas são as mesmas para pontos e carreiras de crochê." },
+      { q: "Mudei o número de pontos: como distribuo a diferença?", a: "Com a <a href=\"" + distLink + "\">calculadora de aumentos e diminuições</a>." },
+    ],
+    sources: [
+      { href: "https://tricot-arte.blogspot.com/2014/10/da.html", label: "Fazendo Arte com Amor — Calculando o número de pontos no tricô" },
+      { href: "https://www.filati.es/acerca-de-filati/adaptar-modelos.html", label: "Lana Grossa (filati.es) — Converter receitas (em espanhol)" },
+    ],
+    r: {
+      sts: "Pontos a montar",
+      rows: "Carreiras",
+      exact: "Exato",
+      real: "Medida real",
+      yours: "Seus pontos",
+      cm: "cm",
+      error: "Confira os dados: todos devem ser números maiores que 0.",
+    },
+  },
+}[lang];
+---
+
+<Base
+  lang={lang}
+  title={C.title}
+  description={C.description}
+  page="gauge"
+  jsonLd={[toolJsonLd(lang, path, C.h1, C.description), faqJsonLd(C.faq)]}
+>
+  <h1>{C.h1}</h1>
+  <p class="lead">{C.lead}</p>
+
+  <form class="card" id="gauge-a" novalidate>
+    <h2 class="sub">{C.aTitle}</h2>
+    <div class="form-grid">
+      <div><label for="ga-sts">{C.swatchSts}</label><input id="ga-sts" name="sts" type="number" inputmode="decimal" min="0" step="any" value="22" /></div>
+      <div><label for="ga-w">{C.swatchW}</label><input id="ga-w" name="sw" type="number" inputmode="decimal" min="0" step="any" value="10" /></div>
+      <div><label for="ga-rows">{C.swatchRows}</label><input id="ga-rows" name="rows" type="number" inputmode="decimal" min="0" step="any" value="30" /></div>
+      <div><label for="ga-h">{C.swatchH}</label><input id="ga-h" name="sh" type="number" inputmode="decimal" min="0" step="any" value="10" /></div>
+      <div><label for="ga-width">{C.width}</label><input id="ga-width" name="width" type="number" inputmode="decimal" min="0" step="any" placeholder="50" /></div>
+      <div><label for="ga-height">{C.height}</label><input id="ga-height" name="height" type="number" inputmode="decimal" min="0" step="any" placeholder="60" /></div>
+      <div><label for="ga-mult">{C.multiple}</label><input id="ga-mult" name="mult" type="number" inputmode="numeric" min="1" step="1" value="1" /><span class="hint">{C.multipleHint}</span></div>
+      <div><label for="ga-extra">{C.extra}</label><input id="ga-extra" name="extra" type="number" inputmode="numeric" min="0" step="1" value="0" /></div>
+    </div>
+    <div class="actions"><button class="btn" type="submit">{t.calc}</button></div>
+    <div class="result" id="gauge-a-result" aria-live="polite"></div>
+  </form>
+
+  <form class="card" id="gauge-b" novalidate style="margin-top:18px">
+    <h2 class="sub">{C.bTitle}</h2>
+    <div class="form-grid">
+      <div><label for="gb-pg">{C.patternGauge}</label><input id="gb-pg" name="pg" type="number" inputmode="decimal" min="0" step="any" placeholder="17" /></div>
+      <div><label for="gb-yg">{C.yourGauge}</label><input id="gb-yg" name="yg" type="number" inputmode="decimal" min="0" step="any" placeholder="23" /></div>
+      <div><label for="gb-pc">{C.patternCount}</label><input id="gb-pc" name="pc" type="number" inputmode="decimal" min="0" step="any" placeholder="44" /><span class="hint">{C.patternHint}</span></div>
+      <div><label for="gb-mult">{C.multiple}</label><input id="gb-mult" name="mult" type="number" inputmode="numeric" min="1" step="1" value="1" /></div>
+      <div><label for="gb-extra">{C.extra}</label><input id="gb-extra" name="extra" type="number" inputmode="numeric" min="0" step="1" value="0" /></div>
+    </div>
+    <div class="actions"><button class="btn" type="submit">{t.calc}</button></div>
+    <div class="result" id="gauge-b-result" aria-live="polite"></div>
+  </form>
+  <script type="application/json" id="gauge-i18n" set:html={JSON.stringify(C.r)} />
+
+  <AdSlot />
+
+  <h2>{C.howTitle}</h2>
+  {C.how.map((p) => <p set:html={p} />)}
+
+  <h3>{C.exampleTitle}</h3>
+  <p class="example" set:html={C.example} />
+
+  <Faq title={t.faq} items={C.faq} />
+
+  <h2>{t.sources}</h2>
+  <ul>{C.sources.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}</a></li>)}</ul>
+</Base>
+
+<script>
+  import { countForSize, sizeForCount, convertCount, roundToMultiple } from "../../lib/gauge";
+
+  const s = JSON.parse(document.getElementById("gauge-i18n")!.textContent!);
+  const fmt = new Intl.NumberFormat(document.documentElement.lang, { maximumFractionDigits: 1 });
+  const num = (data: FormData, key: string) => {
+    const raw = String(data.get(key) ?? "").trim();
+    return raw === "" ? NaN : Number(raw);
+  };
+  const bad = () => `<div class="status bad">${s.error}</div>`;
+  const multiple = (data: FormData) => ({
+    m: Number.isInteger(num(data, "mult")) && num(data, "mult") >= 1 ? num(data, "mult") : 1,
+    e: Number.isInteger(num(data, "extra")) && num(data, "extra") >= 0 ? num(data, "extra") : 0,
+  });
+
+  function bind(id: string, render: (data: FormData) => string) {
+    const form = document.getElementById(id) as HTMLFormElement;
+    const out = document.getElementById(`${id}-result`) as HTMLElement;
+    const run = () => {
+      try {
+        out.innerHTML = render(new FormData(form));
+      } catch {
+        out.innerHTML = bad();
+      }
+    };
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      run();
+    });
+    form.addEventListener("input", run);
+  }
+
+  bind("gauge-a", (data) => {
+    const width = num(data, "width");
+    if (Number.isNaN(width)) return "";
+    const sts = { count: num(data, "sts"), over: num(data, "sw") };
+    const { m, e } = multiple(data);
+    const exact = countForSize(sts, width);
+    const cast = roundToMultiple(exact, m, e);
+    let rows = "";
+    const height = num(data, "height");
+    if (!Number.isNaN(height)) {
+      const rg = { count: num(data, "rows"), over: num(data, "sh") };
+      const exactRows = countForSize(rg, height);
+      rows = `<tr><th scope="row">${s.rows}</th><td class="num"><b>${Math.round(exactRows)}</b></td><td class="num">${fmt.format(exactRows)}</td><td class="num">${fmt.format(sizeForCount(rg, Math.round(exactRows)))} ${s.cm}</td></tr>`;
+    }
+    return `<table><thead><tr><th></th><th></th><th>${s.exact}</th><th>${s.real}</th></tr></thead><tbody>
+      <tr><th scope="row">${s.sts}</th><td class="num"><b>${cast}</b></td><td class="num">${fmt.format(exact)}</td><td class="num">${fmt.format(sizeForCount(sts, cast))} ${s.cm}</td></tr>${rows}</tbody></table>`;
+  });
+
+  bind("gauge-b", (data) => {
+    const pc = num(data, "pc");
+    if (Number.isNaN(pc)) return "";
+    const exact = convertCount(pc, { count: num(data, "pg"), over: 10 }, { count: num(data, "yg"), over: 10 });
+    const { m, e } = multiple(data);
+    return `<p>${s.yours}: <span class="big-number">${roundToMultiple(exact, m, e)}</span> <span class="hint">(${s.exact}: ${fmt.format(exact)})</span></p>`;
+  });
+</script>

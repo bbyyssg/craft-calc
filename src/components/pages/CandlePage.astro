@@ -1,0 +1,255 @@
+---
+import Base from "../../layouts/Base.astro";
+import Faq from "../Faq.astro";
+import AdSlot from "../AdSlot.astro";
+import { ui } from "../../i18n/ui";
+import { faqJsonLd, toolJsonLd } from "../../lib/seo";
+import { pagePath, type Lang } from "../../site";
+import { WAX_FACTORS } from "../../lib/candle";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui(lang);
+const path = pagePath(lang, "candle");
+
+const C = {
+  es: {
+    title: "Calculadora de velas: gramos de cera y fragancia",
+    h1: "Calculadora de cera y fragancia para velas",
+    description:
+      "Calcula los gramos de cera y de fragancia para velas de soja, parafina, coco o abeja a partir del agua que cabe en el envase o del peso final, con el porcentaje de fragancia sobre la cera.",
+    lead: "Pesa el agua que cabe en tu envase (hasta donde llegará la cera) o indica el peso final de la vela, elige el porcentaje de fragancia y obtén los gramos exactos de cera y de aceite aromático.",
+    method: "Parto de…",
+    water: "El agua que cabe en el envase",
+    total: "El peso final de cada vela",
+    grams: "Gramos",
+    gramsHint: "Agua hasta la línea de llenado, sin contar el envase",
+    wax: "Tipo de cera",
+    waxes: { soy: "Soja", paraffin: "Parafina", coconut: "Coco / mezclas", beeswax: "Cera de abeja" },
+    factor: "Factor de densidad",
+    factorHint: "Gramos de cera por gramo de agua. Usa el de la ficha técnica si lo tienes",
+    load: "Fragancia (% sobre el peso de la cera)",
+    loadHint: "Habitual: 6–10 %. No superes el máximo de tu cera",
+    count: "Número de velas",
+    howTitle: "Cómo se calcula",
+    how: [
+      "<b>Peso que cabe en el envase</b>: la cera es más ligera que el agua (aprox. 0,86 g por cada gramo de agua en ceras de envase y 0,96 en cera de abeja). <span class=\"formula\">relleno = agua × factor</span>. Ese relleno es cera + fragancia juntas.",
+      "<b>Fragancia sobre la cera</b>: los fabricantes expresan la carga de fragancia como porcentaje del peso de la cera. Por eso <span class=\"formula\">cera = relleno ÷ (1 + %)</span> y <span class=\"formula\">fragancia = relleno − cera</span>, que es lo mismo que cera × %.",
+      "Mide siempre en <b>peso</b> (gramos), no en mililitros ni en gotas: las fragancias tienen densidades distintas.",
+    ],
+    exampleTitle: "Ejemplo resuelto",
+    example:
+      "Un vaso admite 250 g de agua hasta la línea de llenado; cera de soja (0,86) y fragancia al 8 %. Relleno = 250 × 0,86 = 215 g. Cera = 215 ÷ 1,08 = 199,1 g. Fragancia = 215 − 199,1 = 15,9 g (que es el 8 % de 199,1 g).",
+    safetyTitle: "Seguridad",
+    safety: [
+      "No superes la carga máxima de fragancia indicada por el fabricante de la cera (muchas ceras de soja admiten como máximo un 10–12 %). Un exceso puede «sudar» aceite en la superficie y hacer una llama inestable o con humo.",
+      "Añade la fragancia a la temperatura que indique el fabricante de la cera (en muchas ceras de soja, en torno a 80–85 °C) y nunca calientes la cera directamente al fuego: usa baño maría o un fundidor con termostato.",
+      "Comprueba la ficha de seguridad (FDS) de la fragancia: su punto de inflamación y si está indicada para velas. No todos los aceites esenciales son aptos.",
+      "Haz siempre una prueba de combustión de varias horas con la mecha elegida antes de vender o regalar las velas.",
+    ],
+    faq: [
+      { q: "¿El porcentaje de fragancia es sobre la cera o sobre el total?", a: "En esta calculadora, sobre la cera, que es como lo expresan la mayoría de fabricantes («carga de fragancia»). Algunas guías lo calculan sobre el peso total; con un 10 % la diferencia es pequeña (9,1 % del total frente a 10 % de la cera), pero conviene saber qué método sigue tu proveedor." },
+      { q: "¿Qué porcentaje de fragancia uso en cera de soja?", a: "Lo habitual es entre un 6 % y un 10 %. Empieza por un 6–8 % y sube solo si el aroma en frío y en caliente se queda corto y tu cera lo admite." },
+      { q: "¿Por qué no basta con llenar el envase de cera derretida?", a: "Porque necesitas saber cuánta cera fundir y cuánta fragancia pesar antes de verter. Pesar el agua del envase una vez te da el dato para todas las tandas." },
+      { q: "¿Sirve para velas de molde o pilares?", a: "Sí: mide el agua que cabe en el molde, usa el factor de tu cera y un porcentaje adecuado para pilares (consulta al fabricante; suele estar entre un 6 % y un 10 %)." },
+      { q: "¿Puedo usar aceites esenciales?", a: "Sí, pero rinden menos aroma que las fragancias para velas, algunos tienen puntos de inflamación bajos y otros pueden irritar. Revisa su ficha de seguridad y no superes el máximo de la cera." },
+    ],
+    sources: [
+      { href: "https://armatagecandlecompany.com/blog/candle-math-equations/", label: "Armatage Candle Company — Candle math equations (factor 0,86 y cera = total ÷ (1 + %))" },
+      { href: "https://vento.barcelona/blogs/inspiracion/velas-y-fragancia-como-calcular-la-cantidad-de-fragancia-por-tipo-de-cera", label: "Vento Barcelona — Cantidad de fragancia por tipo de cera" },
+    ],
+    r: {
+      perCandle: "Por vela",
+      allCandles: "Total ({n} velas)",
+      wax: "Cera",
+      fragrance: "Fragancia",
+      total: "Relleno total",
+      g: "g",
+      high: "Más del 12 %: por encima del máximo de la mayoría de ceras. Comprueba la ficha técnica de tu cera.",
+      error: "Escribe los gramos, un porcentaje entre 0 y 50 y un número entero de velas.",
+    },
+  },
+  pt: {
+    title: "Calculadora de velas: gramas de cera e essência",
+    h1: "Calculadora de cera e essência para velas",
+    description:
+      "Calcule os gramas de cera e de essência para velas de soja, parafina, coco ou abelha a partir da água que cabe no recipiente ou do peso final, com a porcentagem de essência sobre a cera.",
+    lead: "Pese a água que cabe no seu recipiente (até onde a cera vai chegar) ou informe o peso final da vela, escolha a porcentagem de essência e receba os gramas exatos de cera e de essência.",
+    method: "Vou partir de…",
+    water: "A água que cabe no recipiente",
+    total: "O peso final de cada vela",
+    grams: "Gramas",
+    gramsHint: "Água até a linha de enchimento, sem contar o recipiente",
+    wax: "Tipo de cera",
+    waxes: { soy: "Soja", paraffin: "Parafina", coconut: "Coco / blends", beeswax: "Cera de abelha" },
+    factor: "Fator de densidade",
+    factorHint: "Gramas de cera por grama de água. Use o da ficha técnica se tiver",
+    load: "Essência (% sobre o peso da cera)",
+    loadHint: "Comum: 6–10%. Não ultrapasse o máximo da sua cera",
+    count: "Número de velas",
+    howTitle: "Como é calculado",
+    how: [
+      "<b>Peso que cabe no recipiente</b>: a cera é mais leve que a água (cerca de 0,86 g para cada grama de água nas ceras de recipiente e 0,96 na cera de abelha). <span class=\"formula\">enchimento = água × fator</span>. Esse enchimento é cera + essência juntas.",
+      "<b>Essência sobre a cera</b>: os fabricantes expressam a carga de essência como porcentagem do peso da cera. Por isso <span class=\"formula\">cera = enchimento ÷ (1 + %)</span> e <span class=\"formula\">essência = enchimento − cera</span>, que é o mesmo que cera × %.",
+      "Meça sempre em <b>peso</b> (gramas), não em mililitros nem em gotas: as essências têm densidades diferentes.",
+    ],
+    exampleTitle: "Exemplo resolvido",
+    example:
+      "Um copo comporta 250 g de água até a linha de enchimento; cera de soja (0,86) e essência a 8%. Enchimento = 250 × 0,86 = 215 g. Cera = 215 ÷ 1,08 = 199,1 g. Essência = 215 − 199,1 = 15,9 g (que é 8% de 199,1 g).",
+    safetyTitle: "Segurança",
+    safety: [
+      "Não ultrapasse a carga máxima de essência indicada pelo fabricante da cera (muitas ceras de soja aceitam no máximo 10–12%). O excesso pode «suar» óleo na superfície e deixar a chama instável ou com fumaça.",
+      "Adicione a essência na temperatura indicada pelo fabricante da cera (em muitas ceras de soja, por volta de 80–85 °C) e nunca aqueça a cera direto no fogo: use banho-maria ou um derretedor com termostato.",
+      "Confira a ficha de segurança (FISPQ) da essência: o ponto de fulgor e se ela é indicada para velas. Nem todo óleo essencial é adequado.",
+      "Faça sempre um teste de queima de várias horas com o pavio escolhido antes de vender ou presentear as velas.",
+    ],
+    faq: [
+      { q: "A porcentagem de essência é sobre a cera ou sobre o total?", a: "Nesta calculadora, sobre a cera, como a maioria dos fabricantes expressa («carga de fragrância»). Alguns guias calculam sobre o peso total; com 10% a diferença é pequena (9,1% do total contra 10% da cera), mas vale saber qual método seu fornecedor usa." },
+      { q: "Quanto de essência usar na cera de soja?", a: "O comum é entre 6% e 10%. Comece com 6–8% e só aumente se o aroma a frio e a quente ficar fraco e sua cera aceitar." },
+      { q: "Por que não basta encher o recipiente com cera derretida?", a: "Porque você precisa saber quanta cera derreter e quanta essência pesar antes de despejar. Pesar a água do recipiente uma vez dá o dado para todas as fornadas." },
+      { q: "Serve para velas de molde ou pilar?", a: "Sim: meça a água que cabe no molde, use o fator da sua cera e uma porcentagem adequada para pilares (consulte o fabricante; costuma ficar entre 6% e 10%)." },
+      { q: "Posso usar óleos essenciais?", a: "Sim, mas eles perfumam menos que as essências para velas, alguns têm ponto de fulgor baixo e outros podem irritar. Confira a ficha de segurança e não ultrapasse o máximo da cera." },
+    ],
+    sources: [
+      { href: "https://armatagecandlecompany.com/blog/candle-math-equations/", label: "Armatage Candle Company — Candle math equations (fator 0,86 e cera = total ÷ (1 + %), em inglês)" },
+      { href: "https://nandebotanica.com.br/guia-completo-aromatizacao-oleos-essenciais-fixacao-fragrancias-velas-de-soja/", label: "Nandê Botânica — Aromatização de velas de soja" },
+    ],
+    r: {
+      perCandle: "Por vela",
+      allCandles: "Total ({n} velas)",
+      wax: "Cera",
+      fragrance: "Essência",
+      total: "Enchimento total",
+      g: "g",
+      high: "Mais de 12%: acima do máximo da maioria das ceras. Confira a ficha técnica da sua cera.",
+      error: "Digite os gramas, uma porcentagem entre 0 e 50 e um número inteiro de velas.",
+    },
+  },
+}[lang];
+
+const waxKeys = Object.keys(WAX_FACTORS) as (keyof typeof WAX_FACTORS)[];
+---
+
+<Base
+  lang={lang}
+  title={C.title}
+  description={C.description}
+  page="candle"
+  jsonLd={[toolJsonLd(lang, path, C.h1, C.description), faqJsonLd(C.faq)]}
+>
+  <h1>{C.h1}</h1>
+  <p class="lead">{C.lead}</p>
+
+  <form class="card" id="candle-form" novalidate>
+    <fieldset>
+      <legend>{C.method}</legend>
+      <div class="radio-row">
+        <label><input type="radio" name="method" value="water" checked /> {C.water}</label>
+        <label><input type="radio" name="method" value="total" /> {C.total}</label>
+      </div>
+    </fieldset>
+    <div class="form-grid" style="margin-top:12px">
+      <div>
+        <label for="k-grams">{C.grams}</label>
+        <input id="k-grams" name="grams" type="number" inputmode="decimal" min="0" step="any" placeholder="250" />
+        <span class="hint">{C.gramsHint}</span>
+      </div>
+      <div id="k-wax-wrap">
+        <label for="k-wax">{C.wax}</label>
+        <select id="k-wax" name="wax">
+          {waxKeys.map((k) => <option value={k} data-factor={WAX_FACTORS[k]}>{C.waxes[k]}</option>)}
+        </select>
+      </div>
+      <div id="k-factor-wrap">
+        <label for="k-factor">{C.factor}</label>
+        <input id="k-factor" name="factor" type="number" inputmode="decimal" min="0.5" max="1.1" step="0.01" value="0.86" />
+        <span class="hint">{C.factorHint}</span>
+      </div>
+      <div>
+        <label for="k-load">{C.load}</label>
+        <input id="k-load" name="load" type="number" inputmode="decimal" min="0" max="50" step="0.5" value="8" />
+        <span class="hint">{C.loadHint}</span>
+      </div>
+      <div>
+        <label for="k-count">{C.count}</label>
+        <input id="k-count" name="count" type="number" inputmode="numeric" min="1" step="1" value="1" />
+      </div>
+    </div>
+    <div class="actions"><button class="btn" type="submit">{t.calc}</button></div>
+    <div class="result" id="candle-result" aria-live="polite"></div>
+  </form>
+  <script type="application/json" id="candle-i18n" set:html={JSON.stringify(C.r)} />
+
+  <AdSlot />
+
+  <h2>{C.howTitle}</h2>
+  {C.how.map((p) => <p set:html={p} />)}
+
+  <h3>{C.exampleTitle}</h3>
+  <p class="example" set:html={C.example} />
+
+  <h2>{C.safetyTitle}</h2>
+  <ul>{C.safety.map((p) => <li>{p}</li>)}</ul>
+
+  <Faq title={t.faq} items={C.faq} />
+
+  <h2>{t.sources}</h2>
+  <ul>{C.sources.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}</a></li>)}</ul>
+</Base>
+
+<script>
+  import { candleFromWater, candleFromTotal } from "../../lib/candle";
+
+  const form = document.getElementById("candle-form") as HTMLFormElement;
+  const out = document.getElementById("candle-result") as HTMLElement;
+  const waxSelect = document.getElementById("k-wax") as HTMLSelectElement;
+  const factorInput = document.getElementById("k-factor") as HTMLInputElement;
+  const waterOnly = ["k-wax-wrap", "k-factor-wrap"].map((id) => document.getElementById(id) as HTMLElement);
+  const s = JSON.parse(document.getElementById("candle-i18n")!.textContent!);
+  const fmt = new Intl.NumberFormat(document.documentElement.lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const g = (n: number) => `${fmt.format(n)} ${s.g}`;
+
+  function render() {
+    const data = new FormData(form);
+    const method = data.get("method") === "total" ? "total" : "water";
+    waterOnly.forEach((el) => (el.hidden = method !== "water"));
+    const raw = String(data.get("grams") ?? "").trim();
+    if (!raw) {
+      out.innerHTML = "";
+      return;
+    }
+    const grams = Number(raw);
+    const load = Number(data.get("load"));
+    const count = Number(data.get("count"));
+    const factor = Number(data.get("factor"));
+    let r;
+    try {
+      r = method === "water" ? candleFromWater(grams, load, count, factor) : candleFromTotal(grams, load, count);
+    } catch {
+      out.innerHTML = `<div class="status bad">${s.error}</div>`;
+      return;
+    }
+    const warn = load > 12 ? `<div class="status warn">${s.high}</div>` : "";
+    const many = count > 1;
+    const head = `<tr><th></th><th>${s.perCandle}</th>${many ? `<th>${s.allCandles.replace("{n}", count)}</th>` : ""}</tr>`;
+    const row = (label: string, a: number, b: number, bold = false) =>
+      `<tr><th scope="row">${label}</th><td class="num">${bold ? `<b>${g(a)}</b>` : g(a)}</td>${many ? `<td class="num">${bold ? `<b>${g(b)}</b>` : g(b)}</td>` : ""}</tr>`;
+    out.innerHTML = `${warn}<table><thead>${head}</thead><tbody>
+      ${row(s.wax, r.perCandle.wax, r.wax, true)}
+      ${row(s.fragrance, r.perCandle.fragrance, r.fragrance, true)}
+      ${row(s.total, r.perCandle.total, r.total)}
+    </tbody></table>`;
+  }
+
+  waxSelect.addEventListener("change", () => {
+    factorInput.value = waxSelect.selectedOptions[0].dataset.factor ?? "0.86";
+    render();
+  });
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    render();
+  });
+  form.addEventListener("input", render);
+</script>

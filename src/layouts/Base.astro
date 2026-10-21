@@ -1,0 +1,86 @@
+---
+import "../styles/global.css";
+import { SITE, LANGS, TOOLS, HTML_LANG, OG_LOCALE, pagePath, asset, type Lang, type PageKey } from "../site";
+import { ui } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  page: PageKey;
+  jsonLd?: object[];
+}
+
+const { lang, title, description, page, jsonLd = [] } = Astro.props;
+const t = ui(lang);
+const otherLang: Lang = lang === "es" ? "pt" : "es";
+const abs = (p: string) => new URL(p, SITE.url).href;
+const path = pagePath(lang, page);
+const canonical = abs(path);
+const fullTitle = page === "home" ? `${SITE.name} — ${title}` : `${title} | ${SITE.name}`;
+---
+
+<!doctype html>
+<html lang={HTML_LANG[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={abs(pagePath(l, page))} />)}
+    <link rel="alternate" hreflang="x-default" href={abs(pagePath("es", page))} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    <link rel="icon" href={asset("/favicon.svg")} type="image/svg+xml" />
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    {
+      SITE.adsenseClient && (
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.adsenseClient}`}
+          crossorigin="anonymous"
+        />
+      )
+    }
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href={pagePath(lang, "home")}>{SITE.name}</a>
+        <nav class="site-nav" aria-label="Herramientas">
+          {
+            TOOLS.map((key) => (
+              <a href={pagePath(lang, key)} aria-current={page === key ? "page" : undefined}>
+                {t.nav[key]}
+              </a>
+            ))
+          }
+        </nav>
+        <a class="lang-switch" href={pagePath(otherLang, page)} hreflang={HTML_LANG[otherLang]} lang={HTML_LANG[otherLang]}>
+          {t.switchLang}
+        </a>
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>{t.disclaimerShort}</p>
+        <p>{t.lastReviewed}: {SITE.lastReviewed}</p>
+        <nav aria-label="Footer">
+          <a href={pagePath(lang, "about")}>{t.footerLinks.about}</a>
+          <a href={pagePath(lang, "privacy")}>{t.footerLinks.privacy}</a>
+        </nav>
+        <p>© {new Date().getFullYear()} {SITE.name}</p>
+      </div>
+    </footer>
+  </body>
+</html>
