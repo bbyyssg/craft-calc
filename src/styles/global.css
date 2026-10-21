@@ -123,3 +123,8 @@ legend { font-weight: 600; font-size: 14px; margin-block-end: 4px; padding: 0; }
 .checkbox { font-weight: 400; display: inline-flex; gap: 6px; align-items: center; }
 .checkbox input { width: auto; }
 .sub { margin: 18px 0 8px; font-size: 16px; }
+.affiliate { margin: 28px 0; }
+.affiliate h2 { margin: 0 0 8px; font-size: 18px; }
+.affiliate ul { margin: 0 0 8px; padding-inline-start: 20px; }
+.affiliate .hint { display: block; }
+.affiliate li .hint { display: inline; }

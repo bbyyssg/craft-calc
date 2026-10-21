@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import Faq from "../Faq.astro";
 import AdSlot from "../AdSlot.astro";
+import AffiliateBox from "../AffiliateBox.astro";
 import { ui } from "../../i18n/ui";
 import { faqJsonLd, toolJsonLd } from "../../lib/seo";
 import { pagePath, type Lang } from "../../site";
@@ -42,6 +43,7 @@ const C = {
     exampleTitle: "Ejemplo resuelto",
     example:
       "Un vaso admite 250 g de agua hasta la línea de llenado; cera de soja (0,86) y fragancia al 8 %. Relleno = 250 × 0,86 = 215 g. Cera = 215 ÷ 1,08 = 199,1 g. Fragancia = 215 − 199,1 = 15,9 g (que es el 8 % de 199,1 g).",
+    costLink: "¿Vas a vender tus velas? Con estos gramos, calcula el costo de cada vela y su precio de venta en la <a href=\"{href}\">calculadora de costo y precio de velas</a>.",
     safetyTitle: "Seguridad",
     safety: [
       "No superes la carga máxima de fragancia indicada por el fabricante de la cera (muchas ceras de soja admiten como máximo un 10–12 %). Un exceso puede «sudar» aceite en la superficie y hacer una llama inestable o con humo.",
@@ -98,6 +100,7 @@ const C = {
     exampleTitle: "Exemplo resolvido",
     example:
       "Um copo comporta 250 g de água até a linha de enchimento; cera de soja (0,86) e essência a 8%. Enchimento = 250 × 0,86 = 215 g. Cera = 215 ÷ 1,08 = 199,1 g. Essência = 215 − 199,1 = 15,9 g (que é 8% de 199,1 g).",
+    costLink: "Vai vender suas velas? Com esses gramas, calcule o custo de cada vela e o preço de venda na <a href=\"{href}\">calculadora de custo e preço de velas</a>.",
     safetyTitle: "Segurança",
     safety: [
       "Não ultrapasse a carga máxima de essência indicada pelo fabricante da cera (muitas ceras de soja aceitam no máximo 10–12%). O excesso pode «suar» óleo na superfície e deixar a chama instável ou com fumaça.",
@@ -181,6 +184,7 @@ const waxKeys = Object.keys(WAX_FACTORS) as (keyof typeof WAX_FACTORS)[];
     <div class="result" id="candle-result" aria-live="polite"></div>
   </form>
   <script type="application/json" id="candle-i18n" set:html={JSON.stringify(C.r)} />
+  <p class="notice" set:html={C.costLink.replace("{href}", pagePath(lang, "candleCost"))} />
 
   <AdSlot />
 
@@ -192,6 +196,8 @@ const waxKeys = Object.keys(WAX_FACTORS) as (keyof typeof WAX_FACTORS)[];
 
   <h2>{C.safetyTitle}</h2>
   <ul>{C.safety.map((p) => <li>{p}</li>)}</ul>
+
+  <AffiliateBox lang={lang} products={["scale", "thermometer", "wicks", "fragranceOil"]} />
 
   <Faq title={t.faq} items={C.faq} />
 

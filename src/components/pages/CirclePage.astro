@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import Faq from "../Faq.astro";
 import AdSlot from "../AdSlot.astro";
+import AffiliateBox from "../AffiliateBox.astro";
 import { ui } from "../../i18n/ui";
 import { faqJsonLd, toolJsonLd } from "../../lib/seo";
 import { pagePath, type Lang } from "../../site";
@@ -163,6 +164,8 @@ const C = {
 
   <h3>{C.exampleTitle}</h3>
   <p class="example" set:html={C.example} />
+
+  <AffiliateBox lang={lang} products={["markers", "hooks", "rowCounter"]} />
 
   <Faq title={t.faq} items={C.faq} />
 

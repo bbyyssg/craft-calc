@@ -1,0 +1,65 @@
+---
+// Amazon affiliate links for the supplies a page talks about. Renders nothing until a
+// tracking tag is set for at least one store of this language in AFFILIATE_STORES (src/site.ts).
+import { AFFILIATE_STORES, type Lang } from "../site";
+import { ui } from "../i18n/ui";
+import { affiliateUrl } from "../lib/affiliate";
+
+// Search terms per product, in the words shoppers use on each marketplace.
+const PRODUCTS = {
+  scale: { es: ["Báscula de precisión (0,1 g)", "bascula de precision 0.1 g"], pt: ["Balança de precisão (0,1 g)", "balança de precisão 0,1g"] },
+  thermometer: { es: ["Termómetro digital de sonda", "termometro digital sonda cocina"], pt: ["Termômetro digital culinário", "termômetro digital culinário"] },
+  wicks: { es: ["Mechas para velas con base", "mechas para velas"], pt: ["Pavios para velas com base", "pavio para velas"] },
+  soyWax: { es: ["Cera de soja para velas", "cera de soja para velas"], pt: ["Cera de soja para velas", "cera de soja para velas"] },
+  fragranceOil: { es: ["Fragancias para velas", "fragancias para velas"], pt: ["Essências para velas", "essência para velas"] },
+  jars: { es: ["Vasos de vidrio para velas", "vasos para velas"], pt: ["Potes de vidro para velas", "pote de vidro para velas"] },
+  labels: { es: ["Etiquetas adhesivas para envases", "etiquetas adhesivas personalizables"], pt: ["Etiquetas adesivas para potes", "etiquetas adesivas para potes"] },
+  markers: { es: ["Marcadores de puntos", "marcadores de puntos tejer"], pt: ["Marcadores de pontos", "marcador de pontos tricô"] },
+  rowCounter: { es: ["Contador de vueltas", "contador de vueltas tejer"], pt: ["Contador de carreiras", "contador de carreiras tricô"] },
+  hooks: { es: ["Juego de agujas de ganchillo", "set agujas ganchillo"], pt: ["Kit de agulhas de crochê", "kit agulhas de crochê"] },
+  tape: { es: ["Cinta métrica flexible", "cinta metrica costura"], pt: ["Fita métrica de costura", "fita métrica costura"] },
+} as const;
+
+export type AffiliateProduct = keyof typeof PRODUCTS;
+
+interface Props {
+  lang: Lang;
+  products: AffiliateProduct[];
+}
+const { lang, products } = Astro.props;
+const t = ui(lang).affiliate;
+const stores = AFFILIATE_STORES[lang].filter((s) => s.tag);
+const items = products.map((key) => {
+  const [label, query] = PRODUCTS[key][lang];
+  return { label, links: stores.map((s) => ({ store: s.label, href: affiliateUrl(s.domain, query, s.tag) })) };
+});
+---
+
+{
+  stores.length > 0 && (
+    <aside class="card affiliate">
+      <h2>{t.title}</h2>
+      <ul>
+        {items.map((item) =>
+          stores.length === 1 ? (
+            <li>
+              <a href={item.links[0].href} rel="sponsored nofollow noopener" target="_blank">{item.label}</a>
+              <span class="hint"> ({item.links[0].store})</span>
+            </li>
+          ) : (
+            <li>
+              {item.label}:{" "}
+              {item.links.map((l, i) => (
+                <>
+                  {i > 0 && " · "}
+                  <a href={l.href} rel="sponsored nofollow noopener" target="_blank">{l.store}</a>
+                </>
+              ))}
+            </li>
+          ),
+        )}
+      </ul>
+      <p class="hint">{t.disclosure}</p>
+    </aside>
+  )
+}

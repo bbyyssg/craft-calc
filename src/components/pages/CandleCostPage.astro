@@ -1,0 +1,339 @@
+---
+import Base from "../../layouts/Base.astro";
+import Faq from "../Faq.astro";
+import AdSlot from "../AdSlot.astro";
+import AffiliateBox from "../AffiliateBox.astro";
+import { ui } from "../../i18n/ui";
+import { faqJsonLd, toolJsonLd } from "../../lib/seo";
+import { pagePath, type Lang } from "../../site";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui(lang);
+const path = pagePath(lang, "candleCost");
+const fragranceHref = pagePath(lang, "candle");
+
+const C = {
+  es: {
+    title: "Calculadora de costo y precio de velas artesanales",
+    h1: "Calculadora de costo y precio de velas",
+    description:
+      "Calcula cuánto te cuesta cada vela (cera, fragancia, mecha, envase, etiqueta, mano de obra y gastos) y su precio mayorista y de venta al público con la regla del doble.",
+    lead: "Escribe lo que pagas por los materiales y el tiempo que te lleva una tanda. Obtienes el costo real de cada vela, un precio mayorista (costo × 2) y un precio de venta al público (mayorista × 2). Usa tu moneda: los cálculos no dependen de ella.",
+    batch: "Tanda",
+    count: "Número de velas en la tanda",
+    waxTitle: "Cera",
+    waxPrice: "Precio de la cera por kg",
+    waxGrams: "Gramos de cera por vela",
+    waxGramsHint: `¿No lo sabes? Calcúlalo con la <a href="${fragranceHref}">calculadora de fragancia</a>`,
+    fragTitle: "Fragancia",
+    fragPrice: "Precio del frasco",
+    fragBottle: "Contenido del frasco (g)",
+    fragBottleHint: "1000 si el precio es por kg",
+    fragGrams: "Gramos de fragancia por vela",
+    perTitle: "Otros materiales (por vela)",
+    wick: "Mecha",
+    container: "Envase y tapa",
+    packaging: "Etiqueta y embalaje",
+    laborTitle: "Mano de obra y gastos",
+    minutes: "Minutos de trabajo de toda la tanda",
+    minutesHint: "Preparar, fundir, verter, limpiar, etiquetar",
+    rate: "Tu tarifa por hora",
+    overhead: "Gastos indirectos (%)",
+    overheadHint: "Luz, gas, herramientas, pruebas fallidas, comisiones. Habitual: 10–20 %",
+    pricesTitle: "Precios",
+    wholesaleMult: "Multiplicador mayorista (× costo)",
+    retailMult: "Multiplicador de venta al público (× mayorista)",
+    multHint: "Habitual: 2",
+    howTitle: "Cómo se calcula",
+    how: [
+      "<b>Materiales por vela</b>: <span class=\"formula\">cera = precio por kg × gramos ÷ 1000</span>, <span class=\"formula\">fragancia = precio del frasco × gramos ÷ contenido del frasco</span>, más mecha, envase y etiqueta.",
+      "<b>Mano de obra por vela</b>: <span class=\"formula\">minutos de la tanda ÷ 60 × tarifa por hora ÷ número de velas</span>. Tu tiempo es un costo: si no lo cuentas, trabajas gratis.",
+      "<b>Gastos indirectos</b>: un porcentaje sobre materiales + mano de obra para lo que no se ve en cada vela (luz, gas, herramientas, pruebas que salen mal, comisiones de la plataforma).",
+      "<b>Precios</b>: <span class=\"formula\">mayorista = costo × 2</span> y <span class=\"formula\">venta al público = mayorista × 2</span> (unas 4 veces el costo). Es la regla del doble (<i>keystone</i>): la tienda que te compra al por mayor necesita su propio margen para revenderla.",
+    ],
+    exampleTitle: "Ejemplo resuelto",
+    example:
+      "Tanda de 10 velas. Cera a 5,00 por kg y 200 g por vela = 1,00. Fragancia de un frasco de 500 g que cuesta 30,00, 16 g por vela = 0,96. Mecha 0,15, envase 1,20, etiqueta 0,40. Materiales = 3,71. Mano de obra: 60 minutos a 12,00 la hora = 12,00 ÷ 10 velas = 1,20. Gastos indirectos 10 % de 4,91 = 0,49. <b>Costo por vela = 5,40</b>. Precio mayorista = 5,40 × 2 = <b>10,80</b>; venta al público = 10,80 × 2 = <b>21,60</b>.",
+    faq: [
+      { q: "¿Por qué tengo que incluir mi tiempo en el costo?", a: "Porque si el precio solo cubre los materiales, cada vela que vendes paga la cera pero no tus horas. Ponte una tarifa por hora realista (lo que cobrarías por otro trabajo) y repártela entre las velas de la tanda. Así el «beneficio» que muestra la calculadora es ganancia del negocio, no tu sueldo." },
+      { q: "¿Qué entra en los gastos indirectos?", a: "Todo lo que no forma parte de una vela concreta: electricidad o gas, herramientas y jarras que se desgastan, velas de prueba, roturas, comisiones de la tienda online o de la pasarela de pago y material de envío. Muchos fabricantes suman entre un 10 % y un 20 % sobre el costo base." },
+      { q: "¿Por qué el mayorista es el doble del costo y el precio final el doble del mayorista?", a: "Es la regla del doble (<i>keystone</i>), habitual en productos artesanales: tú ganas un margen al vender a una tienda y la tienda gana el suyo al revender al público. Si vendes directamente, muchas guías recomiendan cobrar entre 3 y 4 veces el costo. Puedes cambiar ambos multiplicadores." },
+      { q: "¿Y si el precio de venta sale más alto que el de la competencia?", a: "Revisa primero los costos: comprar cera y fragancia al por mayor, o envases por cajas, baja mucho el costo por vela. Después ajusta el multiplicador de venta al público según tu posicionamiento (básica, premium, regalo), pero no vendas al por mayor por debajo de lo que te cuesta producir." },
+      { q: "¿Incluye impuestos?", a: "No. Los precios no incluyen IVA ni otros impuestos, que dependen de tu país y de tu régimen fiscal. Súmalos al precio de venta al público según corresponda y consulta a un asesor si vendes de forma habitual." },
+    ],
+    sources: [
+      { href: "https://www.candlescience.com/how-to-price-your-candles/", label: "CandleScience — How to price your candles (2 × costo al por mayor, 3–4 × en venta directa; en inglés)" },
+      { href: "https://candlecraft.mx/blogs/velas-artesanales-fabricar-emprender/%F0%9F%95%AF%EF%B8%8F-como-calcular-el-precio-de-una-vela-artesanal-segun-tu-inversion", label: "Candlecraft México — Cómo calcular el precio de una vela artesanal (mano de obra por vela y 10–20 % de gastos indirectos)" },
+    ],
+    r: {
+      perCandle: "Por vela",
+      batch: "Tanda ({n} velas)",
+      wax: "Cera",
+      fragrance: "Fragancia",
+      wick: "Mecha",
+      container: "Envase",
+      packaging: "Etiqueta y embalaje",
+      materials: "Materiales",
+      labor: "Mano de obra",
+      overhead: "Gastos indirectos",
+      cost: "Costo total",
+      wholesale: "Precio mayorista",
+      retail: "Precio de venta al público",
+      profit: "Beneficio por vela: {p} (margen {m} %)",
+      errors: {
+        count: "El número de velas debe ser un número entero mayor que 0.",
+        wax: "Escribe el precio de la cera y los gramos de cera por vela.",
+        fragrance: "Para la fragancia, indica también el contenido del frasco en gramos.",
+        money: "Los precios, los minutos y la tarifa no pueden ser negativos.",
+        overhead: "Los gastos indirectos deben estar entre 0 y 200 %.",
+        multiplier: "Los multiplicadores deben estar entre 1 y 10.",
+      },
+    },
+  },
+  pt: {
+    title: "Calculadora de custo e preço de velas artesanais",
+    h1: "Calculadora de custo e preço de velas",
+    description:
+      "Calcule quanto custa cada vela (cera, essência, pavio, recipiente, rótulo, mão de obra e despesas) e o preço de atacado e de varejo com a regra do dobro.",
+    lead: "Informe quanto você paga pelos materiais e o tempo que leva uma fornada. Você recebe o custo real de cada vela, um preço de atacado (custo × 2) e um preço de varejo (atacado × 2). Use a sua moeda: os cálculos não dependem dela.",
+    batch: "Fornada",
+    count: "Número de velas na fornada",
+    waxTitle: "Cera",
+    waxPrice: "Preço da cera por kg",
+    waxGrams: "Gramas de cera por vela",
+    waxGramsHint: `Não sabe? Calcule na <a href="${fragranceHref}">calculadora de essência</a>`,
+    fragTitle: "Essência",
+    fragPrice: "Preço do frasco",
+    fragBottle: "Conteúdo do frasco (g)",
+    fragBottleHint: "1000 se o preço for por kg",
+    fragGrams: "Gramas de essência por vela",
+    perTitle: "Outros materiais (por vela)",
+    wick: "Pavio",
+    container: "Recipiente e tampa",
+    packaging: "Rótulo e embalagem",
+    laborTitle: "Mão de obra e despesas",
+    minutes: "Minutos de trabalho da fornada inteira",
+    minutesHint: "Preparar, derreter, despejar, limpar, rotular",
+    rate: "Valor da sua hora",
+    overhead: "Despesas indiretas (%)",
+    overheadHint: "Luz, gás, ferramentas, testes que deram errado, taxas. Comum: 10–20%",
+    pricesTitle: "Preços",
+    wholesaleMult: "Multiplicador de atacado (× custo)",
+    retailMult: "Multiplicador de varejo (× atacado)",
+    multHint: "Comum: 2",
+    howTitle: "Como é calculado",
+    how: [
+      "<b>Materiais por vela</b>: <span class=\"formula\">cera = preço por kg × gramas ÷ 1000</span>, <span class=\"formula\">essência = preço do frasco × gramas ÷ conteúdo do frasco</span>, mais pavio, recipiente e rótulo.",
+      "<b>Mão de obra por vela</b>: <span class=\"formula\">minutos da fornada ÷ 60 × valor da hora ÷ número de velas</span>. Seu tempo é um custo: se você não o conta, trabalha de graça.",
+      "<b>Despesas indiretas</b>: uma porcentagem sobre materiais + mão de obra para o que não aparece em cada vela (luz, gás, ferramentas, testes que dão errado, taxas da plataforma).",
+      "<b>Preços</b>: <span class=\"formula\">atacado = custo × 2</span> e <span class=\"formula\">varejo = atacado × 2</span> (cerca de 4 vezes o custo). É a regra do dobro (<i>keystone</i>): a loja que compra no atacado precisa da própria margem para revender.",
+    ],
+    exampleTitle: "Exemplo resolvido",
+    example:
+      "Fornada de 10 velas. Cera a 5,00 por kg e 200 g por vela = 1,00. Essência de um frasco de 500 g que custa 30,00, 16 g por vela = 0,96. Pavio 0,15, recipiente 1,20, rótulo 0,40. Materiais = 3,71. Mão de obra: 60 minutos a 12,00 por hora = 12,00 ÷ 10 velas = 1,20. Despesas indiretas 10% de 4,91 = 0,49. <b>Custo por vela = 5,40</b>. Atacado = 5,40 × 2 = <b>10,80</b>; varejo = 10,80 × 2 = <b>21,60</b>.",
+    faq: [
+      { q: "Por que incluir o meu tempo no custo?", a: "Porque, se o preço só cobre os materiais, cada vela vendida paga a cera, mas não as suas horas. Defina um valor por hora realista (por exemplo, o salário mensal que você quer dividido pelas horas que trabalha no mês) e divida entre as velas da fornada. Assim o «lucro» que a calculadora mostra é do negócio, não o seu salário." },
+      { q: "O que entra nas despesas indiretas?", a: "Tudo o que não faz parte de uma vela específica: luz ou gás, ferramentas e jarras que se desgastam, velas de teste, perdas, taxas do marketplace ou da maquininha e material de envio. É comum somar de 10% a 20% sobre o custo base." },
+      { q: "Por que o atacado é o dobro do custo e o varejo o dobro do atacado?", a: "É a regra do dobro (<i>keystone</i>), comum em produtos artesanais: você tem margem ao vender para uma loja, e a loja tem a dela ao revender. No atacado, as lojas costumam esperar de 30% a 50% de desconto sobre o preço de varejo. Os dois multiplicadores podem ser alterados." },
+      { q: "E se o preço de varejo ficar acima da concorrência?", a: "Revise primeiro os custos: comprar cera e essência no atacado, ou recipientes em caixa, reduz bastante o custo por vela. Depois ajuste o multiplicador de varejo ao seu posicionamento (básica, premium, presente), mas não venda no atacado abaixo do que custa produzir." },
+      { q: "Os impostos estão incluídos?", a: "Não. Os preços não incluem impostos (por exemplo, o DAS do MEI ou ICMS), que dependem da sua cidade, estado e regime. Some-os ao preço de venda conforme o caso e consulte um contador se vende com frequência." },
+    ],
+    sources: [
+      { href: "https://www.candlescience.com/how-to-price-your-candles/", label: "CandleScience — How to price your candles (2 × custo no atacado, 3–4 × na venda direta; em inglês)" },
+      { href: "https://nandebotanica.com.br/guia-completo-precificacao-custos-formalizacao-velas-artesanais/", label: "Nandê Botânica — Guia de precificação e custos de velas artesanais (desconto de 30–50% no atacado)" },
+    ],
+    r: {
+      perCandle: "Por vela",
+      batch: "Fornada ({n} velas)",
+      wax: "Cera",
+      fragrance: "Essência",
+      wick: "Pavio",
+      container: "Recipiente",
+      packaging: "Rótulo e embalagem",
+      materials: "Materiais",
+      labor: "Mão de obra",
+      overhead: "Despesas indiretas",
+      cost: "Custo total",
+      wholesale: "Preço de atacado",
+      retail: "Preço de varejo",
+      profit: "Lucro por vela: {p} (margem de {m}%)",
+      errors: {
+        count: "O número de velas deve ser um número inteiro maior que 0.",
+        wax: "Informe o preço da cera e os gramas de cera por vela.",
+        fragrance: "Para a essência, informe também o conteúdo do frasco em gramas.",
+        money: "Preços, minutos e valor da hora não podem ser negativos.",
+        overhead: "As despesas indiretas devem ficar entre 0 e 200%.",
+        multiplier: "Os multiplicadores devem ficar entre 1 e 10.",
+      },
+    },
+  },
+}[lang];
+
+const num = (id: string, label: string, opts: { placeholder?: string; value?: string; hint?: string; step?: string; int?: boolean } = {}) => ({ id, label, ...opts });
+const groups = [
+  { title: C.batch, fields: [num("count", C.count, { value: "10", int: true })] },
+  {
+    title: C.waxTitle,
+    fields: [num("waxPricePerKg", C.waxPrice, { placeholder: "5" }), num("waxGrams", C.waxGrams, { placeholder: "200", hint: C.waxGramsHint })],
+  },
+  {
+    title: C.fragTitle,
+    fields: [
+      num("fragrancePrice", C.fragPrice, { placeholder: "30" }),
+      num("fragranceBottleGrams", C.fragBottle, { value: "1000", hint: C.fragBottleHint }),
+      num("fragranceGrams", C.fragGrams, { placeholder: "16" }),
+    ],
+  },
+  {
+    title: C.perTitle,
+    fields: [num("wick", C.wick, { placeholder: "0.15" }), num("container", C.container, { placeholder: "1.20" }), num("packaging", C.packaging, { placeholder: "0.40" })],
+  },
+  {
+    title: C.laborTitle,
+    fields: [
+      num("laborMinutes", C.minutes, { placeholder: "60", hint: C.minutesHint }),
+      num("hourlyRate", C.rate, { placeholder: "12" }),
+      num("overheadPercent", C.overhead, { value: "10", hint: C.overheadHint }),
+    ],
+  },
+  {
+    title: C.pricesTitle,
+    fields: [
+      num("wholesaleMultiplier", C.wholesaleMult, { value: "2", step: "0.1", hint: C.multHint }),
+      num("retailMultiplier", C.retailMult, { value: "2", step: "0.1", hint: C.multHint }),
+    ],
+  },
+];
+---
+
+<Base
+  lang={lang}
+  title={C.title}
+  description={C.description}
+  page="candleCost"
+  jsonLd={[toolJsonLd(lang, path, C.h1, C.description), faqJsonLd(C.faq)]}
+>
+  <h1>{C.h1}</h1>
+  <p class="lead">{C.lead}</p>
+
+  <form class="card" id="cost-form" novalidate>
+    {
+      groups.map((g) => (
+        <>
+          <h2 class="sub">{g.title}</h2>
+          <div class="form-grid">
+            {g.fields.map((f) => (
+              <div>
+                <label for={`cc-${f.id}`}>{f.label}</label>
+                <input
+                  id={`cc-${f.id}`}
+                  name={f.id}
+                  type="number"
+                  inputmode={f.int ? "numeric" : "decimal"}
+                  min="0"
+                  step={f.int ? "1" : (f.step ?? "any")}
+                  placeholder={f.placeholder}
+                  value={f.value}
+                />
+                {f.hint && <span class="hint" set:html={f.hint} />}
+              </div>
+            ))}
+          </div>
+        </>
+      ))
+    }
+    <div class="actions"><button class="btn" type="submit">{t.calc}</button></div>
+    <div class="result" id="cost-result" aria-live="polite"></div>
+  </form>
+  <script type="application/json" id="cost-i18n" set:html={JSON.stringify(C.r)} />
+
+  <AdSlot />
+
+  <h2>{C.howTitle}</h2>
+  {C.how.map((p) => <p set:html={p} />)}
+
+  <h3>{C.exampleTitle}</h3>
+  <p class="example" set:html={C.example} />
+
+  <AffiliateBox lang={lang} products={["soyWax", "fragranceOil", "wicks", "jars", "labels", "scale"]} />
+
+  <Faq title={t.faq} items={C.faq} />
+
+  <h2>{t.sources}</h2>
+  <ul>{C.sources.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}</a></li>)}</ul>
+</Base>
+
+<script>
+  import { candleCost, validateCandleCost, type CandleCostInput } from "../../lib/candleCost";
+
+  const form = document.getElementById("cost-form") as HTMLFormElement;
+  const out = document.getElementById("cost-result") as HTMLElement;
+  const s = JSON.parse(document.getElementById("cost-i18n")!.textContent!);
+  const fmt = new Intl.NumberFormat(document.documentElement.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pct = new Intl.NumberFormat(document.documentElement.lang, { maximumFractionDigits: 0 });
+
+  function render() {
+    const data = new FormData(form);
+    const raw = (k: string) => String(data.get(k) ?? "").trim();
+    // Optional costs may stay empty (= 0); the wax price and grams are required.
+    if (!raw("waxPricePerKg") || !raw("waxGrams")) {
+      out.innerHTML = "";
+      return;
+    }
+    const n = (k: string) => (raw(k) === "" ? 0 : Number(raw(k)));
+    const input: CandleCostInput = {
+      count: n("count"),
+      waxPricePerKg: n("waxPricePerKg"),
+      waxGrams: n("waxGrams"),
+      fragrancePrice: n("fragrancePrice"),
+      fragranceBottleGrams: n("fragranceBottleGrams"),
+      fragranceGrams: n("fragranceGrams"),
+      wick: n("wick"),
+      container: n("container"),
+      packaging: n("packaging"),
+      laborMinutes: n("laborMinutes"),
+      hourlyRate: n("hourlyRate"),
+      overheadPercent: n("overheadPercent"),
+      wholesaleMultiplier: raw("wholesaleMultiplier") === "" ? 2 : n("wholesaleMultiplier"),
+      retailMultiplier: raw("retailMultiplier") === "" ? 2 : n("retailMultiplier"),
+    };
+    const error = validateCandleCost(input);
+    if (error) {
+      out.innerHTML = `<div class="status bad">${s.errors[error]}</div>`;
+      return;
+    }
+    const r = candleCost(input);
+    const p = r.perCandle;
+    const many = input.count > 1;
+    const head = `<tr><th></th><th>${s.perCandle}</th>${many ? `<th>${s.batch.replace("{n}", input.count)}</th>` : ""}</tr>`;
+    const row = (label: string, v: number, bold = false) => {
+      const cell = (x: number) => (bold ? `<b>${fmt.format(x)}</b>` : fmt.format(x));
+      return `<tr><th scope="row">${label}</th><td class="num">${cell(v)}</td>${many ? `<td class="num">${cell(v * input.count)}</td>` : ""}</tr>`;
+    };
+    const price = (label: string, value: number, profit: number) =>
+      `<div class="status ok"><div>${label}</div><div class="big-number">${fmt.format(value)}</div><div>${s.profit
+        .replace("{p}", fmt.format(profit))
+        .replace("{m}", pct.format(value > 0 ? (profit / value) * 100 : 0))}</div></div>`;
+    out.innerHTML = `${price(s.wholesale, r.wholesale, r.wholesaleProfit)}${price(s.retail, r.retail, r.retailProfit)}
+    <table><thead>${head}</thead><tbody>
+      ${row(s.wax, p.wax)}
+      ${p.fragrance ? row(s.fragrance, p.fragrance) : ""}
+      ${p.wick ? row(s.wick, p.wick) : ""}
+      ${p.container ? row(s.container, p.container) : ""}
+      ${p.packaging ? row(s.packaging, p.packaging) : ""}
+      ${row(s.materials, p.materials, true)}
+      ${row(s.labor, p.labor)}
+      ${row(s.overhead, p.overhead)}
+      ${row(s.cost, p.cost, true)}
+    </tbody></table>`;
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    render();
+  });
+  form.addEventListener("input", render);
+</script>

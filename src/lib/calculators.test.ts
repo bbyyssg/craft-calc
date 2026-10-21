@@ -4,6 +4,8 @@ import { distribute, evenSplit, toRuns, validateDistribute, changesBetween } fro
 import { circleRounds, circleDiameter, roundsForDiameter } from "./circle.ts";
 import { countForSize, sizeForCount, convertCount, roundToMultiple } from "./gauge.ts";
 import { candleFromWater, candleFromTotal, fragranceForWax } from "./candle.ts";
+import { candleCost, validateCandleCost, type CandleCostInput } from "./candleCost.ts";
+import { affiliateUrl } from "./affiliate.ts";
 
 const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
 
@@ -161,4 +163,70 @@ test("candle: several candles and fragrance for a known wax weight", () => {
   assert.equal(fragranceForWax(200, 7), 14);
   assert.throws(() => candleFromWater(0, 8));
   assert.throws(() => candleFromWater(100, 8, 1.5));
+});
+
+// Worked example on the candle cost page: 10 candles, 200 g wax at 5/kg, 16 g fragrance from a
+// 30-per-500 g bottle, wick 0.15, jar 1.20, label 0.40, 60 min at 12/h, 10 % overhead.
+const example: CandleCostInput = {
+  count: 10,
+  waxPricePerKg: 5,
+  waxGrams: 200,
+  fragrancePrice: 30,
+  fragranceBottleGrams: 500,
+  fragranceGrams: 16,
+  wick: 0.15,
+  container: 1.2,
+  packaging: 0.4,
+  laborMinutes: 60,
+  hourlyRate: 12,
+  overheadPercent: 10,
+};
+
+test("candle cost: page example → cost 5.40, wholesale 10.80, retail 21.60", () => {
+  const r = candleCost(example);
+  assert.equal(r.perCandle.wax, 1);
+  assert.equal(r.perCandle.fragrance, 0.96);
+  assert.equal(r.perCandle.materials, 3.71);
+  assert.equal(r.perCandle.labor, 1.2);
+  assert.equal(r.perCandle.overhead, 0.49);
+  assert.equal(r.perCandle.cost, 5.4);
+  assert.equal(r.wholesale, 10.8);
+  assert.equal(r.retail, 21.6);
+  assert.equal(r.wholesaleProfit, 5.4);
+  assert.equal(r.retailProfit, 16.2);
+  assert.equal(r.batchCost, 54);
+  assert.equal(r.batchRetail, 216);
+});
+
+test("candle cost: custom multipliers, no overhead, fragrance priced per kg", () => {
+  const r = candleCost({ ...example, overheadPercent: 0, fragrancePrice: 60, fragranceBottleGrams: 1000, wholesaleMultiplier: 2.5, retailMultiplier: 1.8 });
+  assert.equal(r.perCandle.fragrance, 0.96);
+  assert.equal(r.perCandle.cost, 4.91);
+  assert.equal(r.wholesale, 12.28); // 4.91 × 2.5 = 12.275
+  assert.equal(r.retail, 22.1); // 12.28 × 1.8 = 22.104
+});
+
+test("candle cost: labour is spread over the batch; optional costs may be 0", () => {
+  const one = candleCost({ ...example, count: 1, overheadPercent: 0 });
+  assert.equal(one.perCandle.labor, 12);
+  const bare = candleCost({ ...example, fragranceGrams: 0, fragranceBottleGrams: 0, wick: 0, container: 0, packaging: 0, laborMinutes: 0, overheadPercent: 0 });
+  assert.equal(bare.perCandle.cost, 1);
+  assert.equal(bare.wholesale, 2);
+  assert.equal(bare.retail, 4);
+});
+
+test("candle cost: rejects bad input", () => {
+  assert.equal(validateCandleCost({ ...example, count: 2.5 }), "count");
+  assert.equal(validateCandleCost({ ...example, waxGrams: 0 }), "wax");
+  assert.equal(validateCandleCost({ ...example, fragranceBottleGrams: 0 }), "fragrance");
+  assert.equal(validateCandleCost({ ...example, wick: -1 }), "money");
+  assert.equal(validateCandleCost({ ...example, hourlyRate: NaN }), "money");
+  assert.equal(validateCandleCost({ ...example, retailMultiplier: 0.5 }), "multiplier");
+  assert.equal(validateCandleCost(example), null);
+  assert.throws(() => candleCost({ ...example, count: 0 }));
+});
+
+test("affiliate: Amazon search link carries the query and tag", () => {
+  assert.equal(affiliateUrl("www.amazon.es", "mechas para velas", "abc-21"), "https://www.amazon.es/s?k=mechas+para+velas&tag=abc-21");
+  assert.equal(affiliateUrl("www.amazon.com.br", "balança de precisão", "x-20"), "https://www.amazon.com.br/s?k=balan%C3%A7a+de+precis%C3%A3o&tag=x-20");
 });
