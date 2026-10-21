@@ -52,14 +52,25 @@ npm run build    # 输出到 dist/（15 个页面 + sitemap-index.xml）
 npm run preview  # 本地预览 dist
 ```
 
-## 五、上线步骤
+## 五、上线与域名
 
-1. **定品牌和域名**：现在的「Calculadora Tejer」是占位名。买域名后修改 `src/site.ts`（`name`、`url`）、`astro.config.mjs`（`site`）、`public/robots.txt`（Sitemap 地址）。建议用西语域名，例如 calculadoratejer.com 一类。
-2. **母语审校**：见第三节。
-3. **部署到 Cloudflare Pages**（免费，允许商用）：把本目录放进 Git 仓库并连接，构建命令填 `npm run build`，输出目录填 `dist`，Node 版本设为 22 以上。
-4. **Google Search Console**：验证域名，提交 `https://域名/sitemap-index.xml`。可以把国际定位交给 hreflang 处理，不需要单独设置目标国家。
-5. **AdSense**：建议有一定自然流量、并补充 1～2 篇教程文章后再申请。审核通过后，把发布商 ID 填到 `src/site.ts` 的 `adsenseClient`，再给各页面的 `<AdSlot />` 加上 `slot` 参数；同时更新隐私政策，并为欧盟流量启用 Google CMP。
-6. **后续扩展**：可以加毛线用量（竞争较强，但能和本站工具互相内链）、肩部/袖子加针（«aumentos en las mangas»，按行数均匀分布加针，可复用 `evenSplit`）。
+**当前状态**：已部署到 GitHub Pages。仓库是 https://github.com/bbyyssg/craft-calc （公开）；临时网址是 https://bbyyssg.github.io/craft-calc/ 。每次推送到 `main`，`.github/workflows/deploy.yml` 都会自动跑测试、构建并发布。
+
+**买好 calculadoratejer.com 之后，按下面的步骤切换：**
+
+1. 在 Cloudflare Registrar（或其他注册商）买下 `calculadoratejer.com`。
+2. 添加 DNS 记录。在 Cloudflare 里要把代理关掉，设为「仅 DNS」/灰色云朵，否则 GitHub 签发 HTTPS 证书会失败：
+   - `A` 记录 `@` 指向 `185.199.108.153`、`185.199.109.153`、`185.199.110.153`、`185.199.111.153`（四条）
+   - `CNAME` 记录 `www` 指向 `bbyyssg.github.io`
+3. 新建文件 `public/CNAME`，内容只有一行 `calculadoratejer.com`，然后提交并推送。workflow 检测到这个文件后，会自动按根域名构建，canonical 和 hreflang 都会改成正式域名。
+4. 到 GitHub 仓库的 Settings → Pages → Custom domain 填入 `calculadoratejer.com`，等证书签发完成后勾选 Enforce HTTPS。
+5. 到 Google Search Console 验证域名，提交 `https://calculadoratejer.com/sitemap-index.xml`。
+6. **AdSense**：建议有一定自然流量、并补充 1～2 篇教程文章后再申请。审核通过后，把发布商 ID 填到 `src/site.ts` 的 `adsenseClient`，给各页面的 `<AdSlot />` 加上 `slot` 参数，并在 `public/` 下添加 `ads.txt`；同时更新隐私政策，并为欧盟流量启用 Google CMP。
+7. 母语审校见第三节，最好在申请 AdSense 之前完成。
+
+注意：本地 `npm install` 用的是 npmmirror 镜像，它生成的 lockfile 曾经缺少版本号，导致 CI 失败。以后如果要更新 lockfile，请用 `npm install --package-lock-only --registry=https://registry.npmjs.org`。
+
+后续扩展：可以加毛线用量（竞争较强，但能和本站工具互相内链）、袖子加针（按行数均匀分布加针，可复用 `evenSplit`）。
 
 ## 目录结构
 
